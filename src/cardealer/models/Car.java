@@ -4,10 +4,8 @@
  * and open the template in the editor.
  */
 package cardealer.models;
-
-import cardealer.models.abstracts.CarAbs;
-import cardealer.enums.Direction;
-
+ 
+ 
 import java.util.List;
 import java.util.Objects;
 
@@ -15,7 +13,7 @@ import java.util.Objects;
  *
  * @author ahmet
  */
-public class Car extends CarAbs implements Comparable<Car> {
+public class Car  implements Comparable<Car> {
 
     private final String nl = System.lineSeparator();
     private Long id;
@@ -93,27 +91,7 @@ public class Car extends CarAbs implements Comparable<Car> {
         this.manufacturingYear = manufacturingYear;
     }
  
-
-    public Direction getDirection() {
-        return direction;
-    }
-
-    public void setDirection(Direction direction) {
-        this.direction = direction;
-    }
-
-    public float getSpeed() {
-        return speed;
-    }
-
-    public void setSpeed(float speed) {
-        this.speed = speed;
-    }
-
-    @Override
-    public void move(float speed) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+ 
 
     @Override
     public int compareTo(Car o) {
