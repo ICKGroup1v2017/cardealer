@@ -9,6 +9,11 @@ package cardealer.models;
  *
  * @author ahmet
  */
-public class Sale {
-    
+public class Sale implements Comparable<Sale> {
+    private Long id;
+
+    @Override
+    public int compareTo(Sale o) {
+        return this.id.compareTo(o.id);
+    }
 }
