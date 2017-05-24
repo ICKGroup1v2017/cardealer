@@ -38,6 +38,7 @@ public class CarForm extends javax.swing.JFrame {
     private static ArrayList<Car> mCars;
     private static Car currentCar;
     private static final Logger LOG = Logger.getLogger(CarForm.class.getName());
+    private boolean carInsertFlag = false;
 
     /**
      * Creates new form Main
@@ -66,7 +67,7 @@ public class CarForm extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(CarForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-           jTblCars.setModel(new CarTableModel());
+        jTblCars.setModel(new CarTableModel());
         try {
             Path workingDirectory = Paths.get("").toAbsolutePath();
             String path = workingDirectory + "\\build\\classes\\cardealer\\config\\config.ini";
@@ -85,22 +86,20 @@ public class CarForm extends javax.swing.JFrame {
                 mCars = new ArrayList<>();
                 currentCar = new Car();
                 populateCars();
-                this.setVisible(true);
+                 setVisible(true);
             }
         } catch (IOException | SQLException ex) {
             System.out.println(ex.getMessage());
         }
 
-       
-
         jTblCars.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
-               
-                int index = jTblCars.getSelectedRow();
-                CarTableModel d = ((CarTableModel) jTblCars.getModel());
-                currentCar = d.getSelectedRow(index);
-                placeCarObjectToFields();
+                if (jTblCars.getSelectedRowCount() == 1) {
+                    jBtnEdit.setEnabled(true);
+                } else {
+                    jBtnEdit.setEnabled(false);
+                }
 
             }
 
@@ -124,7 +123,7 @@ public class CarForm extends javax.swing.JFrame {
 
             }
         });
-      
+
     }
 
     /**
@@ -145,6 +144,11 @@ public class CarForm extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         jTFCarManufacturingYear = new javax.swing.JTextField();
         jTFCarModel = new javax.swing.JTextField();
+        jBtnCreate = new javax.swing.JButton();
+        jBtnEdit = new javax.swing.JButton();
+        jBtnSave = new javax.swing.JButton();
+        jBtnRefresh = new javax.swing.JButton();
+        jBtnCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -161,45 +165,111 @@ public class CarForm extends javax.swing.JFrame {
         ));
         jScrollPane1.setViewportView(jTblCars);
 
-        jLabel1.setText("Make:");
+        jLabel1.setText("Bërja:");
 
-        jLabel2.setText("Manufacturing year:");
+        jTFCarMake.setEditable(false);
 
-        jLabel3.setText("Model:");
+        jLabel2.setText("Viti i prodhimit:");
+
+        jLabel3.setText("Modeli:");
+
+        jTFCarManufacturingYear.setEditable(false);
+
+        jTFCarModel.setEditable(false);
+
+        jBtnCreate.setText("Shto");
+        jBtnCreate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnCreateActionPerformed(evt);
+            }
+        });
+
+        jBtnEdit.setText("Redakto");
+        jBtnEdit.setEnabled(false);
+        jBtnEdit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnEditActionPerformed(evt);
+            }
+        });
+
+        jBtnSave.setText("Ruaj");
+        jBtnSave.setEnabled(false);
+        jBtnSave.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnSaveActionPerformed(evt);
+            }
+        });
+
+        jBtnRefresh.setText("Rifresko");
+        jBtnRefresh.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnRefreshActionPerformed(evt);
+            }
+        });
+
+        jBtnCancel.setText("Anulo");
+        jBtnCancel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnCancelActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(76, 76, 76)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel3)
-                    .addComponent(jLabel2)
-                    .addComponent(jLabel1))
+                .addGap(58, 58, 58)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jTFCarManufacturingYear, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTFCarModel, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTFCarMake, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jTFCarMake, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTFCarModel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTFCarManufacturingYear, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jBtnCreate)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jBtnEdit))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jBtnRefresh)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jBtnCancel)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jBtnSave)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(jTFCarMake, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTFCarModel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel3))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel1)
+                            .addComponent(jTFCarMake, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(10, 10, 10)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jTFCarModel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel3)))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jBtnCreate)
+                            .addComponent(jBtnEdit)
+                            .addComponent(jBtnSave))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jBtnRefresh)
+                            .addComponent(jBtnCancel))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jTFCarManufacturingYear, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2))
-                .addContainerGap(73, Short.MAX_VALUE))
+                .addContainerGap(77, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -226,12 +296,91 @@ public class CarForm extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    
+    private void jBtnCreateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnCreateActionPerformed
+        // TODO add your handling code here:
+        clearCarFields();
+        setCarFieldsEditable(true);
+        carInsertFlag = true;
+        jBtnCreate.setEnabled(false);
+        jBtnSave.setEnabled(true);
+    }//GEN-LAST:event_jBtnCreateActionPerformed
+
+    private void jBtnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnEditActionPerformed
+        // TODO add your handling code here:
+        if (jTblCars.getSelectedRowCount() == 1) {
+            int index = jTblCars.getSelectedRow();
+            CarTableModel d = ((CarTableModel) jTblCars.getModel());
+            currentCar = d.getSelectedRow(index);
+            placeCarObjectToFields();
+            setCarFieldsEditable(true);
+            jBtnCreate.setEnabled(false);
+            jBtnSave.setEnabled(true);
+            jBtnEdit.setEnabled(false);
+            carInsertFlag = false;
+        }
+    }//GEN-LAST:event_jBtnEditActionPerformed
+
+    private void jBtnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnSaveActionPerformed
+        // TODO add your handling code here:
+        populateCarObject();
+        boolean res = false;
+        try {
+            if (carInsertFlag) {
+                res = cef.create(currentCar);
+
+            } else {
+                res = cef.update(currentCar);
+            }
+            setCarFieldsEditable(false);
+            clearCarFields();
+
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+        if (res) {
+            jBtnCreate.setEnabled(true);
+            jBtnEdit.setEnabled(false);
+            jBtnSave.setEnabled(false);
+            populateCars();
+
+        }
+    }//GEN-LAST:event_jBtnSaveActionPerformed
+
+    private void jBtnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnRefreshActionPerformed
+        // TODO add your handling code here:
+        populateCars();
+    }//GEN-LAST:event_jBtnRefreshActionPerformed
+
+    private void jBtnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnCancelActionPerformed
+        jBtnCreate.setEnabled(true);
+        jBtnEdit.setEnabled(false);
+        jBtnSave.setEnabled(false);
+        clearCarFields();
+        setCarFieldsEditable(false);
+    }//GEN-LAST:event_jBtnCancelActionPerformed
+
+    private void clearCarFields() {
+        this.jTFCarMake.setText("");
+        this.jTFCarModel.setText("");
+        this.jTFCarManufacturingYear.setText("");
+    }
+
+    private void setCarFieldsEditable(boolean flag) {
+        this.jTFCarMake.setEditable(flag);
+        this.jTFCarModel.setEditable(flag);
+        this.jTFCarManufacturingYear.setEditable(flag);
+    }
 
     private void placeCarObjectToFields() {
         this.jTFCarMake.setText(currentCar.getMake());
         this.jTFCarModel.setText(currentCar.getModel());
         this.jTFCarManufacturingYear.setText(currentCar.getManufacturingYear().toString());
+    }
+
+    private void populateCarObject() {
+        currentCar.setMake(this.jTFCarMake.getText());
+        currentCar.setModel(this.jTFCarModel.getText());
+        currentCar.setManufacturingYear(Integer.parseInt(this.jTFCarManufacturingYear.getText()));
     }
 
     private static void populateCars() {
@@ -257,6 +406,11 @@ public class CarForm extends javax.swing.JFrame {
         }
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jBtnCancel;
+    private javax.swing.JButton jBtnCreate;
+    private javax.swing.JButton jBtnEdit;
+    private javax.swing.JButton jBtnRefresh;
+    private javax.swing.JButton jBtnSave;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
