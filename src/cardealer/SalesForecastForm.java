@@ -5,7 +5,28 @@
  */
 package cardealer;
 
+import static cardealer.CarForm.props;
+
+import cardealer.database.Database;
+import cardealer.database.SalesForecastsEntityFacade;
+import cardealer.database.exceptions.EntityExistsException;
+import cardealer.models.Car;
+import cardealer.models.SaleForecast;
+import cardealer.tableModels.SaleForecastTableModel;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.transaction.TransactionRequiredException;
 
 /**
  *
@@ -13,11 +34,77 @@ import java.awt.event.ActionEvent;
  */
 public class SalesForecastForm extends javax.swing.JFrame {
 
+    private SaleForecast currentSaleForecast;
+    private boolean salesForecastInsertFlag;
+    private ArrayList<SaleForecast> mSalesForecasts;
+    private SalesForecastsEntityFacade sfef;
+
     /**
      * Creates new form SalesForecast
      */
     public SalesForecastForm() {
         initComponents();
+        currentSaleForecast = new SaleForecast();
+        salesForecastInsertFlag = false;
+        mSalesForecasts = new ArrayList<>();
+        sfef = new SalesForecastsEntityFacade();
+        jTblSalesForecast.setModel(new SaleForecastTableModel());
+
+        try {
+            Path workingDirectory = Paths.get("").toAbsolutePath();
+            String path = workingDirectory + "\\build\\classes\\cardealer\\config\\config.ini";
+            final String dir = System.getProperty("user.dir");
+
+            File f = new File(path);
+            if (f.exists()) {
+                System.out.println("current dir = " + dir);
+                props = new Properties();
+                props.load(new FileInputStream(path));
+                // TODO code application logic here
+                System.out.println("Trying to connect");
+                CarForm.db = new Database();
+                System.out.println("Connected");
+                sfef = new SalesForecastsEntityFacade();
+                mSalesForecasts = new ArrayList<>();
+                currentSaleForecast = new SaleForecast();
+                populateSalesForecast();
+                this.pack();
+            }
+        } catch (IOException | SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+
+        jTblSalesForecast.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (jTblSalesForecast.getSelectedRowCount() == 1) {
+                    jBtnSaleForecastEdit.setEnabled(true);
+                } else {
+                    jBtnSaleForecastEdit.setEnabled(false);
+                }
+
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+
+            }
+        });
     }
 
     /**
@@ -40,7 +127,11 @@ public class SalesForecastForm extends javax.swing.JFrame {
         jBtnSaleForecastSave = new javax.swing.JButton();
         jBtnSaleForecastRefresh = new javax.swing.JButton();
         jBtnSaleForecastCancel = new javax.swing.JButton();
-        jComboBox1 = new javax.swing.JComboBox<>();
+        jCmbMonths = new javax.swing.JComboBox<>();
+        jTFYear = new javax.swing.JTextField();
+        jTfForecastSale = new javax.swing.JTextField();
+        jTfRealization = new javax.swing.JTextField();
+        jLabel4 = new javax.swing.JLabel();
 
         jTblSalesForecast.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -55,11 +146,11 @@ public class SalesForecastForm extends javax.swing.JFrame {
         ));
         jScrollPane1.setViewportView(jTblSalesForecast);
 
-        jLabel1.setText("Bërja:");
+        jLabel1.setText("Muaji:");
 
-        jLabel2.setText("Viti i prodhimit:");
+        jLabel2.setText("Shitja e planifikuar:");
 
-        jLabel3.setText("Modeli:");
+        jLabel3.setText("Viti:");
 
         jBtnSaleForecastCreate.setText("Shto");
         jBtnSaleForecastCreate.addActionListener(new java.awt.event.ActionListener() {
@@ -98,36 +189,40 @@ public class SalesForecastForm extends javax.swing.JFrame {
             }
         });
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jCmbMonths.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" }));
+
+        jLabel4.setText("Realizimi:");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(58, 58, 58)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jCmbMonths, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTfRealization)
+                    .addComponent(jTFYear, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTfForecastSale))
+                .addGap(35, 35, 35)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(58, 58, 58)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.TRAILING))
-                        .addGap(129, 129, 129)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jBtnSaleForecastCreate)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jBtnSaleForecastEdit))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jBtnSaleForecastRefresh)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jBtnSaleForecastCancel)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jBtnSaleForecastSave))
+                        .addComponent(jBtnSaleForecastCreate)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jBtnSaleForecastEdit))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(203, 203, 203)
-                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(231, Short.MAX_VALUE))
+                        .addComponent(jBtnSaleForecastRefresh)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jBtnSaleForecastCancel)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jBtnSaleForecastSave)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -135,9 +230,13 @@ public class SalesForecastForm extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addGap(16, 16, 16)
-                        .addComponent(jLabel3))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel1)
+                            .addComponent(jCmbMonths, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(10, 10, 10)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel3)
+                            .addComponent(jTFYear, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jBtnSaleForecastCreate)
@@ -148,10 +247,14 @@ public class SalesForecastForm extends javax.swing.JFrame {
                             .addComponent(jBtnSaleForecastRefresh)
                             .addComponent(jBtnSaleForecastCancel))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel2)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(jTfForecastSale, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(57, Short.MAX_VALUE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
+                    .addComponent(jTfRealization, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(51, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -161,7 +264,7 @@ public class SalesForecastForm extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 687, Short.MAX_VALUE)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -170,37 +273,117 @@ public class SalesForecastForm extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 211, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(19, 19, 19))
+                .addGap(31, 31, 31))
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jBtnEditActionPerformed(ActionEvent ae) {
+    private void jBtnSaleForecastCreateActionPerformed(java.awt.event.ActionEvent evt) {
+        // TODO add your handling code here:
+        clearSaleForecastFields();
+        setSaleForecastFieldsEditable(true);
+        salesForecastInsertFlag = true;
+        jBtnSaleForecastCreate.setEnabled(false);
+        jBtnSaleForecastSave.setEnabled(true);
+    }
+
+    private void jBtnSaleForecastEditActionPerformed(java.awt.event.ActionEvent evt) {
+        // TODO add your handling code here:
+        if (jTblSalesForecast.getSelectedRowCount() == 1) {
+            int index = jTblSalesForecast.getSelectedRow();
+            SaleForecastTableModel d = ((SaleForecastTableModel) jTblSalesForecast.getModel());
+            currentSaleForecast = d.getSelectedRow(index);
+            placeSaleForecastbjectToFields();
+            setSaleForecastFieldsEditable(true);
+            jBtnSaleForecastCreate.setEnabled(false);
+            jBtnSaleForecastSave.setEnabled(true);
+            jBtnSaleForecastEdit.setEnabled(false);
+            salesForecastInsertFlag = false;
+        }
+    }
+
+    private void jBtnSaleForecastSaveActionPerformed(ActionEvent evt) {
 
     }
 
-    private void jBtnCreateActionPerformed(ActionEvent ae) {
+    private void jBtnSaleForecastRefreshActionPerformed(ActionEvent evt) {
+    }
+//   
+//    private void jBtnSaleForecastCreateActionPerformed(java.awt.event.ActionEvent evt) {                                                       
+//        // TODO add your handling code here:
+//        clearSaleForecastFields();
+//        setSaleForecastFieldsEditable(true);
+//        saleInsertFlag = true;
+//        jBtnSaleForecastCreate.setEnabled(false);
+//        jBtnSaleForecastSave.setEnabled(true);
+//    }                                                      
+//
+//    private void jBtnSaleForecastEditActionPerformed(java.awt.event.ActionEvent evt) {                                                     
+//        // TODO add your handling code here:
+//        if (jTblSalesForecast.getSelectedRowCount() == 1) {
+//            int index = jTblSalesForecast.getSelectedRow();
+//            SaleForecastTableModel d = ((SaleForecastTableModel) jTblSalesForecast.getModel());
+//            currentSaleForecast = d.getSelectedRow(index);
+//            placeSaleForecastObjectToFields();
+//            setSaleForecastFieldsEditable(true);
+//            jBtnSaleForecastCreate.setEnabled(false);
+//            jBtnSaleForecastSave.setEnabled(true);
+//            jBtnSaleForecastEdit.setEnabled(false);
+//            saleInsertFlag = false;
+//        }
+//    }  
+
+    private void populateSalesForecast() {
+
+        try {
+            mSalesForecasts = sfef.reads();
+        } catch (EntityExistsException ex) {
+            Logger.getLogger(SalesForecastForm.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalStateException ex) {
+            Logger.getLogger(SalesForecastForm.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalArgumentException ex) {
+            Logger.getLogger(SalesForecastForm.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (TransactionRequiredException ex) {
+            Logger.getLogger(SalesForecastForm.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(SalesForecastForm.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void jBtnSaleForecastCancelActionPerformed(ActionEvent evt) {
 
     }
 
-    private void jBtnSaleForecastSaveActionPerformed(ActionEvent ae) {
-
+    private void clearSaleForecastFields() {
+        jCmbMonths.setSelectedIndex(0);
+        jTFYear.setText("");
+        jTfForecastSale.setText("");
+        jTfRealization.setText("");
     }
 
-    private void jBtnSaleForecastRefreshActionPerformed(ActionEvent ae) {
-
+    private void setSaleForecastFieldsEditable(boolean b) {
+       jCmbMonths.setEditable(b);
+        jTFYear .setEditable(b);
+        jTfForecastSale.setEditable(b);
+        jTfRealization.setEditable(b);
     }
 
-    private void jBtnSaleForecastCancelActionPerformed(ActionEvent ae) {
+    private void placeSaleForecastObjectToFields() {
+         jCmbMonths.setSelectedIndex(currentSaleForecast.getSelected_month()-1);
+        jTFYear.setText(""+currentSaleForecast.getSelected_year());
+        jTfForecastSale.setText(""+currentSaleForecast.getIdSaleForecast());
+        jTfRealization.setText(""+currentSaleForecast.getRealization());
+    }
 
+    private void populateSaleForecastObject() {
+        currentSaleForecast.setSelected_month((int)jCmbMonths.getSelectedItem());
+        currentSaleForecast.setSelected_year(Integer.parseInt(jTFYear.getText()));
+        currentSaleForecast.setForecastedSale(Integer.parseInt(jTfForecastSale.getText()));
+        currentSaleForecast.setRealization(Integer.parseInt(jTfRealization.getText()));
     }
-    
-    private void jBtnSaleForecastCreateActionPerformed(ActionEvent ae){
-        
-    }
-    
-    private void jBtnSaleForecastEditActionPerformed(ActionEvent ae){
+
+    private void placeSaleForecastbjectToFields() {
         
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -209,12 +392,16 @@ public class SalesForecastForm extends javax.swing.JFrame {
     private javax.swing.JButton jBtnSaleForecastEdit;
     private javax.swing.JButton jBtnSaleForecastRefresh;
     private javax.swing.JButton jBtnSaleForecastSave;
-    private javax.swing.JComboBox<String> jComboBox1;
+    private javax.swing.JComboBox<String> jCmbMonths;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextField jTFYear;
     private javax.swing.JTable jTblSalesForecast;
+    private javax.swing.JTextField jTfForecastSale;
+    private javax.swing.JTextField jTfRealization;
     // End of variables declaration//GEN-END:variables
 }
