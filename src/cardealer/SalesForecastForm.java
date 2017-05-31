@@ -7,7 +7,7 @@ package cardealer;
 
 import cardealer.database.Database;
 import cardealer.database.SalesForecastsEntityFacade;
-import cardealer.models.Month;
+
 import cardealer.models.SaleForecast;
 import cardealer.tableModels.SaleForecastTableModel;
 import java.awt.event.MouseEvent;
