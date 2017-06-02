@@ -145,7 +145,7 @@
                           </Group>
                       </Group>
                   </Group>
-                  <EmptySpace pref="110" max="32767" attributes="0"/>
+                  <EmptySpace pref="34" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -153,7 +153,7 @@
       <SubComponents>
         <Component class="javax.swing.JLabel" name="jLabel1">
           <Properties>
-            <Property name="text" type="java.lang.String" value="B&#xeb;rja:"/>
+            <Property name="text" type="java.lang.String" value="Blerja:"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel3">

@@ -5,7 +5,7 @@
  */
 package cardealer.database;
 
-import static cardealer.CarForm.db;
+import static cardealer.SalesForecastForm.db;
 import cardealer.models.SaleForecast;
 import java.io.Serializable;
 import javax.transaction.TransactionRequiredException;
@@ -29,11 +29,9 @@ public class SalesForecastsEntityFacade {
             TransactionRequiredException, SQLException {
         boolean res = false;
         
-      String create = "  INSERT INTO `cardealer`.`salesforecast`(`selected_month`,"
-              +"`selected_year`,`forecastedSale`,`realization`)"
-              +"VALUES ( ?,?,?,?);";
+      String create = "INSERT INTO `salesforecast` (`selected_month`, `selected_year`, `forecastedSale`, `realization`) VALUES (?,?,?,?);";
 
-
+        System.out.println(create);
  
         Connection connection = db.conn;
         connection.setAutoCommit(false);

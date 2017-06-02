@@ -39,10 +39,8 @@ public class CarEntityFacade {
             TransactionRequiredException, SQLException {
         boolean res = false;
         String create = "INSERT INTO `car`(  `make`, `model`, "
-                + "`manufacturingYear`, `distance`, `horizontalAngle`, "
-                + "`verticalAngle`, `maxHorizontalAngle`, `minHorizontalAngle`, "
-                + "`maxVerticalAngle`, `minVerticalAngle`) "
-                + "VALUES ( ?,?,?,?,?,?,?,?,?,?);";
+                + "`manufacturingYear`) "
+                + "VALUES ( ?,?,?);";
 
         Connection connection = db.conn;
         connection.setAutoCommit(false);
@@ -104,8 +102,36 @@ public class CarEntityFacade {
         return mCars;
     }
 
-    public boolean update(Car entity) throws IllegalStateException, IllegalArgumentException, TransactionRequiredException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public boolean update(Car entity) throws IllegalStateException, IllegalArgumentException, TransactionRequiredException, SQLException {
+        boolean res = false;
+        String create = "UPDATE `cardealer`.`car`\n"
+                + "SET\n" 
+                + "`make` = ?,\n"
+                + "`model` = ?,\n"
+                + "`manufacturingYear` = ?>\n"
+                + "WHERE `id` = ?;\n";
+
+        Connection connection = db.conn;
+        connection.setAutoCommit(false);
+        if (!connection.isClosed()) {
+            PreparedStatement stmt = connection.prepareStatement(create);
+            try {
+
+                stmt.setString(1, entity.getMake());
+                stmt.setString(2, entity.getModel());
+                stmt.setInt(3, entity.getManufacturingYear());
+
+                res = stmt.execute(create);
+                db.conn.commit();
+            } catch (SQLException ex) {
+                if (db.conn != null) {
+                    System.err.println(ex.getMessage());
+                    System.err.print("Transaction is being rolled back");
+                    db.conn.rollback();
+                }
+            }
+        }
+        return res;
     }
 
     public boolean deleteO(Car entity) throws IllegalStateException, IllegalArgumentException, TransactionRequiredException, PersistenceException {

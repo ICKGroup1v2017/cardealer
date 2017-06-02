@@ -118,9 +118,9 @@
                   <EmptySpace type="separate" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
-                          <Component id="jBtnCreate" min="-2" max="-2" attributes="0"/>
+                          <Component id="jBtnCarCreate" min="-2" max="-2" attributes="0"/>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                          <Component id="jBtnEdit" min="-2" max="-2" attributes="0"/>
+                          <Component id="jBtnCarEdit" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="jBtnRefresh" min="-2" max="-2" attributes="0"/>
@@ -129,7 +129,7 @@
                       </Group>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jBtnSave" min="-2" max="-2" attributes="0"/>
+                  <Component id="jBtnCarSave" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
           </Group>
@@ -152,9 +152,9 @@
                       </Group>
                       <Group type="102" attributes="0">
                           <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="jBtnCreate" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="jBtnEdit" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="jBtnSave" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="jBtnCarCreate" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="jBtnCarEdit" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="jBtnCarSave" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
@@ -204,30 +204,30 @@
             <Property name="editable" type="boolean" value="false"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JButton" name="jBtnCreate">
+        <Component class="javax.swing.JButton" name="jBtnCarCreate">
           <Properties>
             <Property name="text" type="java.lang.String" value="Shto"/>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBtnCreateActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBtnCarCreateActionPerformed"/>
           </Events>
         </Component>
-        <Component class="javax.swing.JButton" name="jBtnEdit">
+        <Component class="javax.swing.JButton" name="jBtnCarEdit">
           <Properties>
             <Property name="text" type="java.lang.String" value="Redakto"/>
             <Property name="enabled" type="boolean" value="false"/>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBtnEditActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBtnCarEditActionPerformed"/>
           </Events>
         </Component>
-        <Component class="javax.swing.JButton" name="jBtnSave">
+        <Component class="javax.swing.JButton" name="jBtnCarSave">
           <Properties>
             <Property name="text" type="java.lang.String" value="Ruaj"/>
             <Property name="enabled" type="boolean" value="false"/>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBtnSaveActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBtnCarSaveActionPerformed"/>
           </Events>
         </Component>
         <Component class="javax.swing.JButton" name="jBtnRefresh">

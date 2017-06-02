@@ -7,6 +7,8 @@ package cardealer;
 
 import cardealer.database.Database;
 import cardealer.database.SalesForecastsEntityFacade;
+import cardealer.database.exceptions.EntityExistsException;
+import cardealer.models.SaleForecast;
 
 import cardealer.models.SaleForecast;
 import cardealer.tableModels.SaleForecastTableModel;
@@ -21,6 +23,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Properties;
+import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.table.DefaultTableModel;
+import javax.transaction.TransactionRequiredException;
 
 /**
  *
@@ -32,7 +39,8 @@ public class SalesForecastForm extends javax.swing.JFrame {
     private boolean salesForecastInsertFlag;
     private ArrayList<SaleForecast> mSalesForecasts;
     private SalesForecastsEntityFacade sfef;
-    private static Properties props;
+    private Properties props;
+    public static Database db;
 
     /**
      * Creates new form SalesForecast
@@ -44,7 +52,7 @@ public class SalesForecastForm extends javax.swing.JFrame {
         mSalesForecasts = new ArrayList<>();
         sfef = new SalesForecastsEntityFacade();
         jTblSalesForecast.setModel(new SaleForecastTableModel());
-
+        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         try {
             Path workingDirectory = Paths.get("").toAbsolutePath();
             String path = workingDirectory + "\\build\\classes\\cardealer\\config\\config.ini";
@@ -57,17 +65,26 @@ public class SalesForecastForm extends javax.swing.JFrame {
                 props.load(new FileInputStream(path));
                 // TODO code application logic here
                 System.out.println("Trying to connect");
-                CarForm.db = new Database();
+                SalesForecastForm.db = new Database(props);
                 System.out.println("Connected");
                 sfef = new SalesForecastsEntityFacade();
                 mSalesForecasts = new ArrayList<>();
                 currentSaleForecast = new SaleForecast();
-                populateSalesForecast();
-               
-                
-               
-                
-                this.pack();
+                try {
+                    populateSalesForecast();
+                    placeSaleForecasts();
+                } catch (SQLException sqlex) {
+
+                } catch (EntityExistsException ex) {
+                    Logger.getLogger(SalesForecastForm.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IllegalStateException ex) {
+                    Logger.getLogger(SalesForecastForm.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IllegalArgumentException ex) {
+                    Logger.getLogger(SalesForecastForm.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (TransactionRequiredException ex) {
+                    Logger.getLogger(SalesForecastForm.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
             }
         } catch (IOException | SQLException ex) {
             System.out.println(ex.getMessage());
@@ -104,6 +121,10 @@ public class SalesForecastForm extends javax.swing.JFrame {
 
             }
         });
+        clearSaleForecastFields();
+        setSaleForecastFieldsEditable(false);
+        this.pack();
+        this.setVisible(true);
     }
 
     /**
@@ -147,7 +168,7 @@ public class SalesForecastForm extends javax.swing.JFrame {
         ));
         jScrollPane1.setViewportView(jTblSalesForecast);
 
-        jLabel1.setText("Bërja:");
+        jLabel1.setText("Blerja:");
 
         jLabel3.setText("Viti:");
 
@@ -255,7 +276,7 @@ public class SalesForecastForm extends javax.swing.JFrame {
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jBtnSaleForecastRefresh)
                             .addComponent(jBtnSaleForecastCancel))))
-                .addContainerGap(110, Short.MAX_VALUE))
+                .addContainerGap(34, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -283,26 +304,93 @@ public class SalesForecastForm extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jBtnSaleForecastCreateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnSaleForecastCreateActionPerformed
-        // TODO add your handling code here:
+        clearSaleForecastFields();
+        setSaleForecastFieldsEditable(true);
+        salesForecastInsertFlag = true;
+        jBtnSaleForecastCreate.setEnabled(false);
+        jBtnSaleForecastSave.setEnabled(true);
     }//GEN-LAST:event_jBtnSaleForecastCreateActionPerformed
 
     private void jBtnSaleForecastEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnSaleForecastEditActionPerformed
-        // TODO add your handling code here:
+        if (jTblSalesForecast.getSelectedRowCount() == 1) {
+            int index = jTblSalesForecast.getSelectedRow();
+            SaleForecastTableModel d = ((SaleForecastTableModel) jTblSalesForecast.getModel());
+            currentSaleForecast = d.getSelectedRow(index);
+            placeSaleForecastObjectToFields();
+            setSaleForecastFieldsEditable(true);
+            jBtnSaleForecastCreate.setEnabled(false);
+            jBtnSaleForecastSave.setEnabled(true);
+            jBtnSaleForecastEdit.setEnabled(false);
+            salesForecastInsertFlag = false;
+        }
     }//GEN-LAST:event_jBtnSaleForecastEditActionPerformed
 
     private void jBtnSaleForecastSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnSaleForecastSaveActionPerformed
         // TODO add your handling code here:
+        populateSaleForecastObject();
+        
+        boolean res = false;
+        try {
+            if (salesForecastInsertFlag) {
+                res = sfef.create(currentSaleForecast);
+
+            } else {
+                res = sfef.update(currentSaleForecast);
+            }
+            setSaleForecastFieldsEditable(false);
+            clearSaleForecastFields();
+
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+        if (res) {
+            jBtnSaleForecastCreate.setEnabled(true);
+            jBtnSaleForecastEdit.setEnabled(false);
+            jBtnSaleForecastSave.setEnabled(false);
+            try {
+                populateSalesForecast();
+                placeSaleForecasts();
+            } catch (SQLException ex) {
+
+            } catch (EntityExistsException ex) {
+                Logger.getLogger(SalesForecastForm.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IllegalStateException ex) {
+                Logger.getLogger(SalesForecastForm.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IllegalArgumentException ex) {
+                Logger.getLogger(SalesForecastForm.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (TransactionRequiredException ex) {
+                Logger.getLogger(SalesForecastForm.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        }
     }//GEN-LAST:event_jBtnSaleForecastSaveActionPerformed
 
     private void jBtnSaleForecastRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnSaleForecastRefreshActionPerformed
-        // TODO add your handling code here:
+        try {
+            // TODO add your handling code here:
+            populateSalesForecast();
+            placeSaleForecasts();
+        } catch (EntityExistsException ex) {
+            Logger.getLogger(SalesForecastForm.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalStateException ex) {
+            Logger.getLogger(SalesForecastForm.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalArgumentException ex) {
+            Logger.getLogger(SalesForecastForm.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (TransactionRequiredException ex) {
+            Logger.getLogger(SalesForecastForm.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(SalesForecastForm.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_jBtnSaleForecastRefreshActionPerformed
 
     private void jBtnSaleForecastCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnSaleForecastCancelActionPerformed
-        // TODO add your handling code here:
+        clearSaleForecastFields();
+        setSaleForecastFieldsEditable(false);
+        jBtnSaleForecastCreate.setEnabled(true);
+        jBtnSaleForecastEdit.setEnabled(false);
+        jBtnSaleForecastSave.setEnabled(false);
     }//GEN-LAST:event_jBtnSaleForecastCancelActionPerformed
 
-    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jBtnSaleForecastCancel;
@@ -323,11 +411,31 @@ public class SalesForecastForm extends javax.swing.JFrame {
     private javax.swing.JTextField jTfRealization;
     // End of variables declaration//GEN-END:variables
 
-    private void populateSalesForecast() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    private void populateSalesForecast() throws EntityExistsException, IllegalStateException, IllegalArgumentException, TransactionRequiredException, SQLException {
+
+        mSalesForecasts = sfef.reads();
+
     }
-    
-    
+
+    private void placeSaleForecasts() {
+        DefaultTableModel tableModel = (DefaultTableModel) jTblSalesForecast.getModel();
+        tableModel.getDataVector().clear();
+        Vector v = new Vector();
+        for (SaleForecast c : mSalesForecasts) {
+            v = new Vector();
+            v.add(c.getIdSaleForecast());
+            v.add(c.getSelected_month());
+            v.add(c.getSelected_year());
+            v.add(c.getForecastedSale());
+            v.add(c.getRealization());
+            v.add(c.getDone_date());
+
+            tableModel.addRow(v);
+
+        }
+        jTblSalesForecast.setModel(tableModel);
+    }
+
     private void clearSaleForecastFields() {
         jCmbMonths.setSelectedIndex(0);
         jTFYear.setText("");
@@ -336,27 +444,26 @@ public class SalesForecastForm extends javax.swing.JFrame {
     }
 
     private void setSaleForecastFieldsEditable(boolean b) {
-       jCmbMonths.setEditable(b);
-        jTFYear .setEditable(b);
+        jCmbMonths.setEnabled(b);
+        jTFYear.setEditable(b);
         jTfForecastSale.setEditable(b);
         jTfRealization.setEditable(b);
+
     }
 
     private void placeSaleForecastObjectToFields() {
-         jCmbMonths.setSelectedIndex(currentSaleForecast.getSelected_month()-1);
-        jTFYear.setText(""+currentSaleForecast.getSelected_year());
-        jTfForecastSale.setText(""+currentSaleForecast.getIdSaleForecast());
-        jTfRealization.setText(""+currentSaleForecast.getRealization());
+        jCmbMonths.setSelectedIndex(currentSaleForecast.getSelected_month() - 1);
+        jTFYear.setText("" + currentSaleForecast.getSelected_year());
+        jTfForecastSale.setText("" + currentSaleForecast.getIdSaleForecast());
+        jTfRealization.setText("" + currentSaleForecast.getRealization());
     }
 
     private void populateSaleForecastObject() {
-        currentSaleForecast.setSelected_month((int)jCmbMonths.getSelectedItem());
+        currentSaleForecast = new SaleForecast();
+        currentSaleForecast.setSelected_month(Integer.parseInt(jCmbMonths.getSelectedItem().toString()));
         currentSaleForecast.setSelected_year(Integer.parseInt(jTFYear.getText()));
         currentSaleForecast.setForecastedSale(Integer.parseInt(jTfForecastSale.getText()));
         currentSaleForecast.setRealization(Integer.parseInt(jTfRealization.getText()));
     }
 
-    private void placeSaleForecastbjectToFields() {
-        
-    }
 }

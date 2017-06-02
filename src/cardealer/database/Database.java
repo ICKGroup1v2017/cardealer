@@ -22,9 +22,9 @@ public class Database {
 
     public Connection conn;
 
-    public Database() throws FileNotFoundException, IOException, SQLException {
+    public Database(Properties _props) throws FileNotFoundException, IOException, SQLException {
         boolean connected = false;
-        Properties props = CarForm.props;
+        Properties props = _props;
 
         try {
 

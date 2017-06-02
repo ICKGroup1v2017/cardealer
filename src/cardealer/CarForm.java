@@ -33,7 +33,7 @@ import javax.transaction.TransactionRequiredException;
 public class CarForm extends javax.swing.JFrame {
 
     public static Database db;
-    public static Properties props;
+    private Properties props;
     private static CarEntityFacade cef;
     private static ArrayList<Car> mCars;
     private static Car currentCar;
@@ -80,13 +80,13 @@ public class CarForm extends javax.swing.JFrame {
                 props.load(new FileInputStream(path));
                 // TODO code application logic here
                 System.out.println("Trying to connect");
-                CarForm.db = new Database();
+                CarForm.db = new Database(props);
                 System.out.println("Connected");
                 cef = new CarEntityFacade();
                 mCars = new ArrayList<>();
                 currentCar = new Car();
                 populateCars();
-                 setVisible(true);
+
             }
         } catch (IOException | SQLException ex) {
             System.out.println(ex.getMessage());
@@ -96,9 +96,9 @@ public class CarForm extends javax.swing.JFrame {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (jTblCars.getSelectedRowCount() == 1) {
-                    jBtnEdit.setEnabled(true);
+                    jBtnCarEdit.setEnabled(true);
                 } else {
-                    jBtnEdit.setEnabled(false);
+                    jBtnCarEdit.setEnabled(false);
                 }
 
             }
@@ -123,7 +123,9 @@ public class CarForm extends javax.swing.JFrame {
 
             }
         });
-
+        this.pack();
+        this.setVisible(true);
+        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
 
     /**
@@ -144,9 +146,9 @@ public class CarForm extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         jTFCarManufacturingYear = new javax.swing.JTextField();
         jTFCarModel = new javax.swing.JTextField();
-        jBtnCreate = new javax.swing.JButton();
-        jBtnEdit = new javax.swing.JButton();
-        jBtnSave = new javax.swing.JButton();
+        jBtnCarCreate = new javax.swing.JButton();
+        jBtnCarEdit = new javax.swing.JButton();
+        jBtnCarSave = new javax.swing.JButton();
         jBtnRefresh = new javax.swing.JButton();
         jBtnCancel = new javax.swing.JButton();
 
@@ -177,26 +179,26 @@ public class CarForm extends javax.swing.JFrame {
 
         jTFCarModel.setEditable(false);
 
-        jBtnCreate.setText("Shto");
-        jBtnCreate.addActionListener(new java.awt.event.ActionListener() {
+        jBtnCarCreate.setText("Shto");
+        jBtnCarCreate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBtnCreateActionPerformed(evt);
+                jBtnCarCreateActionPerformed(evt);
             }
         });
 
-        jBtnEdit.setText("Redakto");
-        jBtnEdit.setEnabled(false);
-        jBtnEdit.addActionListener(new java.awt.event.ActionListener() {
+        jBtnCarEdit.setText("Redakto");
+        jBtnCarEdit.setEnabled(false);
+        jBtnCarEdit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBtnEditActionPerformed(evt);
+                jBtnCarEditActionPerformed(evt);
             }
         });
 
-        jBtnSave.setText("Ruaj");
-        jBtnSave.setEnabled(false);
-        jBtnSave.addActionListener(new java.awt.event.ActionListener() {
+        jBtnCarSave.setText("Ruaj");
+        jBtnCarSave.setEnabled(false);
+        jBtnCarSave.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBtnSaveActionPerformed(evt);
+                jBtnCarSaveActionPerformed(evt);
             }
         });
 
@@ -232,15 +234,15 @@ public class CarForm extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jBtnCreate)
+                        .addComponent(jBtnCarCreate)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jBtnEdit))
+                        .addComponent(jBtnCarEdit))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jBtnRefresh)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jBtnCancel)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jBtnSave)
+                .addComponent(jBtnCarSave)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -258,9 +260,9 @@ public class CarForm extends javax.swing.JFrame {
                             .addComponent(jLabel3)))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jBtnCreate)
-                            .addComponent(jBtnEdit)
-                            .addComponent(jBtnSave))
+                            .addComponent(jBtnCarCreate)
+                            .addComponent(jBtnCarEdit)
+                            .addComponent(jBtnCarSave))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jBtnRefresh)
@@ -296,16 +298,16 @@ public class CarForm extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jBtnCreateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnCreateActionPerformed
+    private void jBtnCarCreateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnCarCreateActionPerformed
         // TODO add your handling code here:
         clearCarFields();
         setCarFieldsEditable(true);
         carInsertFlag = true;
-        jBtnCreate.setEnabled(false);
-        jBtnSave.setEnabled(true);
-    }//GEN-LAST:event_jBtnCreateActionPerformed
+        jBtnCarCreate.setEnabled(false);
+        jBtnCarSave.setEnabled(true);
+    }//GEN-LAST:event_jBtnCarCreateActionPerformed
 
-    private void jBtnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnEditActionPerformed
+    private void jBtnCarEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnCarEditActionPerformed
         // TODO add your handling code here:
         if (jTblCars.getSelectedRowCount() == 1) {
             int index = jTblCars.getSelectedRow();
@@ -313,14 +315,14 @@ public class CarForm extends javax.swing.JFrame {
             currentCar = d.getSelectedRow(index);
             placeCarObjectToFields();
             setCarFieldsEditable(true);
-            jBtnCreate.setEnabled(false);
-            jBtnSave.setEnabled(true);
-            jBtnEdit.setEnabled(false);
+            jBtnCarCreate.setEnabled(false);
+            jBtnCarSave.setEnabled(true);
+            jBtnCarEdit.setEnabled(false);
             carInsertFlag = false;
         }
-    }//GEN-LAST:event_jBtnEditActionPerformed
+    }//GEN-LAST:event_jBtnCarEditActionPerformed
 
-    private void jBtnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnSaveActionPerformed
+    private void jBtnCarSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnCarSaveActionPerformed
         // TODO add your handling code here:
         populateCarObject();
         boolean res = false;
@@ -338,13 +340,13 @@ public class CarForm extends javax.swing.JFrame {
             System.out.println(ex.getMessage());
         }
         if (res) {
-            jBtnCreate.setEnabled(true);
-            jBtnEdit.setEnabled(false);
-            jBtnSave.setEnabled(false);
+            jBtnCarCreate.setEnabled(true);
+            jBtnCarEdit.setEnabled(false);
+            jBtnCarSave.setEnabled(false);
             populateCars();
 
         }
-    }//GEN-LAST:event_jBtnSaveActionPerformed
+    }//GEN-LAST:event_jBtnCarSaveActionPerformed
 
     private void jBtnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnRefreshActionPerformed
         // TODO add your handling code here:
@@ -352,9 +354,9 @@ public class CarForm extends javax.swing.JFrame {
     }//GEN-LAST:event_jBtnRefreshActionPerformed
 
     private void jBtnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnCancelActionPerformed
-        jBtnCreate.setEnabled(true);
-        jBtnEdit.setEnabled(false);
-        jBtnSave.setEnabled(false);
+        jBtnCarCreate.setEnabled(true);
+        jBtnCarEdit.setEnabled(false);
+        jBtnCarSave.setEnabled(false);
         clearCarFields();
         setCarFieldsEditable(false);
     }//GEN-LAST:event_jBtnCancelActionPerformed
@@ -407,10 +409,10 @@ public class CarForm extends javax.swing.JFrame {
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jBtnCancel;
-    private javax.swing.JButton jBtnCreate;
-    private javax.swing.JButton jBtnEdit;
+    private javax.swing.JButton jBtnCarCreate;
+    private javax.swing.JButton jBtnCarEdit;
+    private javax.swing.JButton jBtnCarSave;
     private javax.swing.JButton jBtnRefresh;
-    private javax.swing.JButton jBtnSave;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

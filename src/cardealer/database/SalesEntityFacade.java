@@ -33,8 +33,8 @@ public class SalesEntityFacade {
 "`lastName`,\n" +
 "`price`,\n" +
 "`car_id`,\n"+
-"`paid_date`) "
-                + "VALUES ( ?,?,?,?,?,?);";
+"`paid_date`) \n "
+                + " VALUES ( ?, ?, ?, ?, ?);";
 
         Connection connection = db.conn;
         connection.setAutoCommit(false);
