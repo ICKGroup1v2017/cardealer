@@ -8,10 +8,10 @@ package cardealer;
 import cardealer.database.Database;
 import cardealer.database.SalesForecastsEntityFacade;
 import cardealer.database.exceptions.EntityExistsException;
-import cardealer.models.SaleForecast;
 
 import cardealer.models.SaleForecast;
 import cardealer.tableModels.SaleForecastTableModel;
+import java.awt.Color;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
@@ -26,6 +26,7 @@ import java.util.Properties;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.transaction.TransactionRequiredException;
 
@@ -56,11 +57,10 @@ public class SalesForecastForm extends javax.swing.JFrame {
         try {
             Path workingDirectory = Paths.get("").toAbsolutePath();
             String path = workingDirectory + "\\build\\classes\\cardealer\\config\\config.ini";
-            final String dir = System.getProperty("user.dir");
 
             File f = new File(path);
             if (f.exists()) {
-                System.out.println("current dir = " + dir);
+
                 props = new Properties();
                 props.load(new FileInputStream(path));
                 // TODO code application logic here
@@ -68,20 +68,11 @@ public class SalesForecastForm extends javax.swing.JFrame {
                 SalesForecastForm.db = new Database(props);
                 System.out.println("Connected");
                 sfef = new SalesForecastsEntityFacade();
-                mSalesForecasts = new ArrayList<>();
-                currentSaleForecast = new SaleForecast();
+
                 try {
                     populateSalesForecast();
                     placeSaleForecasts();
-                } catch (SQLException sqlex) {
-
-                } catch (EntityExistsException ex) {
-                    Logger.getLogger(SalesForecastForm.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IllegalStateException ex) {
-                    Logger.getLogger(SalesForecastForm.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IllegalArgumentException ex) {
-                    Logger.getLogger(SalesForecastForm.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (TransactionRequiredException ex) {
+                } catch (SQLException | EntityExistsException | IllegalStateException | IllegalArgumentException | TransactionRequiredException ex) {
                     Logger.getLogger(SalesForecastForm.class.getName()).log(Level.SEVERE, null, ex);
                 }
 
@@ -94,6 +85,12 @@ public class SalesForecastForm extends javax.swing.JFrame {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (jTblSalesForecast.getSelectedRowCount() == 1) {
+                    int index = jTblSalesForecast.getSelectedRow();
+                    currentSaleForecast = ((SaleForecastTableModel) jTblSalesForecast.getModel()).getSelectedRow(index);
+                    jCmbSaleMonths.setSelectedIndex(currentSaleForecast.getSelected_month() - 1);
+                    jTFSaleYear.setText("" + currentSaleForecast.getSelected_year());
+                    jTfForecastSale.setText("" + currentSaleForecast.getIdSaleForecast());
+                    jTfRealization.setText("" + currentSaleForecast.getRealization());
                     jBtnSaleForecastEdit.setEnabled(true);
                 } else {
                     jBtnSaleForecastEdit.setEnabled(false);
@@ -146,14 +143,15 @@ public class SalesForecastForm extends javax.swing.JFrame {
         jBtnSaleForecastSave = new javax.swing.JButton();
         jBtnSaleForecastRefresh = new javax.swing.JButton();
         jBtnSaleForecastCancel = new javax.swing.JButton();
-        jCmbMonths = new javax.swing.JComboBox<>();
-        jTFYear = new javax.swing.JTextField();
+        jCmbSaleMonths = new javax.swing.JComboBox<>();
+        jTFSaleYear = new javax.swing.JTextField();
         jTfForecastSale = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         jTfRealization = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Parashikimi i shitjeve");
 
         jTblSalesForecast.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -168,11 +166,12 @@ public class SalesForecastForm extends javax.swing.JFrame {
         ));
         jScrollPane1.setViewportView(jTblSalesForecast);
 
-        jLabel1.setText("Blerja:");
+        jLabel1.setText("Muaji:");
 
         jLabel3.setText("Viti:");
 
         jBtnSaleForecastCreate.setText("Shto");
+        jBtnSaleForecastCreate.setNextFocusableComponent(jBtnSaleForecastEdit);
         jBtnSaleForecastCreate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jBtnSaleForecastCreateActionPerformed(evt);
@@ -181,6 +180,7 @@ public class SalesForecastForm extends javax.swing.JFrame {
 
         jBtnSaleForecastEdit.setText("Redakto");
         jBtnSaleForecastEdit.setEnabled(false);
+        jBtnSaleForecastEdit.setNextFocusableComponent(jBtnSaleForecastSave);
         jBtnSaleForecastEdit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jBtnSaleForecastEditActionPerformed(evt);
@@ -189,6 +189,7 @@ public class SalesForecastForm extends javax.swing.JFrame {
 
         jBtnSaleForecastSave.setText("Ruaj");
         jBtnSaleForecastSave.setEnabled(false);
+        jBtnSaleForecastSave.setNextFocusableComponent(jBtnSaleForecastRefresh);
         jBtnSaleForecastSave.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jBtnSaleForecastSaveActionPerformed(evt);
@@ -196,6 +197,7 @@ public class SalesForecastForm extends javax.swing.JFrame {
         });
 
         jBtnSaleForecastRefresh.setText("Rifresko");
+        jBtnSaleForecastRefresh.setNextFocusableComponent(jBtnSaleForecastCancel);
         jBtnSaleForecastRefresh.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jBtnSaleForecastRefreshActionPerformed(evt);
@@ -209,11 +211,31 @@ public class SalesForecastForm extends javax.swing.JFrame {
             }
         });
 
-        jCmbMonths.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" }));
+        jCmbSaleMonths.setRenderer(new DefaultListCellRenderer() {
+            {
+                setHorizontalAlignment(DefaultListCellRenderer.RIGHT);
+                setBackground(Color.WHITE);
+                setForeground(Color.GRAY);
+                setEnabled(false);
+            }
+        });
+        jCmbSaleMonths.setMaximumRowCount(12);
+        jCmbSaleMonths.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" }));
+        jCmbSaleMonths.setToolTipText("Përzgjidh një nga muajt e kalendarit");
+        jCmbSaleMonths.setNextFocusableComponent(jTFSaleYear);
+
+        jTFSaleYear.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        jTFSaleYear.setNextFocusableComponent(jTfForecastSale);
+
+        jTfForecastSale.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        jTfForecastSale.setNextFocusableComponent(jTfRealization);
 
         jLabel4.setText("Parashikimi i shitjes:");
 
         jLabel5.setText("Realizimi i shitjes:");
+
+        jTfRealization.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        jTfRealization.setNextFocusableComponent(jBtnSaleForecastCreate);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -228,10 +250,10 @@ public class SalesForecastForm extends javax.swing.JFrame {
                     .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jTFYear)
+                    .addComponent(jTFSaleYear)
                     .addComponent(jTfForecastSale, javax.swing.GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE)
                     .addComponent(jTfRealization, javax.swing.GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE)
-                    .addComponent(jCmbMonths, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jCmbSaleMonths, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
@@ -254,11 +276,11 @@ public class SalesForecastForm extends javax.swing.JFrame {
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel1)
-                            .addComponent(jCmbMonths, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jCmbSaleMonths, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(10, 10, 10)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel3)
-                            .addComponent(jTFYear, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jTFSaleYear, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(10, 10, 10)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel4)
@@ -305,6 +327,12 @@ public class SalesForecastForm extends javax.swing.JFrame {
 
     private void jBtnSaleForecastCreateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnSaleForecastCreateActionPerformed
         clearSaleForecastFields();
+        Calendar c = Calendar.getInstance();
+        int cyear = c.get(Calendar.YEAR);//calender year starts from 1900 so you must add 1900 to the value recevie.i.e., 1990+112 = 2012
+        int cmonth = c.get(Calendar.MONTH) + 1;//this is april so you will receive  3 instead of 4.
+        jCmbSaleMonths.setSelectedItem("" + cmonth);
+        jCmbSaleMonths.requestFocus();
+        jTFSaleYear.setText("" + cyear);
         setSaleForecastFieldsEditable(true);
         salesForecastInsertFlag = true;
         jBtnSaleForecastCreate.setEnabled(false);
@@ -328,7 +356,7 @@ public class SalesForecastForm extends javax.swing.JFrame {
     private void jBtnSaleForecastSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnSaleForecastSaveActionPerformed
         // TODO add your handling code here:
         populateSaleForecastObject();
-        
+
         boolean res = false;
         try {
             if (salesForecastInsertFlag) {
@@ -337,13 +365,13 @@ public class SalesForecastForm extends javax.swing.JFrame {
             } else {
                 res = sfef.update(currentSaleForecast);
             }
-            setSaleForecastFieldsEditable(false);
-            clearSaleForecastFields();
 
-        } catch (Exception ex) {
+        } catch (EntityExistsException | IllegalArgumentException | IllegalStateException | SQLException | TransactionRequiredException ex) {
             System.out.println(ex.getMessage());
         }
         if (res) {
+            setSaleForecastFieldsEditable(false);
+            clearSaleForecastFields();
             jBtnSaleForecastCreate.setEnabled(true);
             jBtnSaleForecastEdit.setEnabled(false);
             jBtnSaleForecastSave.setEnabled(false);
@@ -351,14 +379,8 @@ public class SalesForecastForm extends javax.swing.JFrame {
                 populateSalesForecast();
                 placeSaleForecasts();
             } catch (SQLException ex) {
-
-            } catch (EntityExistsException ex) {
                 Logger.getLogger(SalesForecastForm.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IllegalStateException ex) {
-                Logger.getLogger(SalesForecastForm.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IllegalArgumentException ex) {
-                Logger.getLogger(SalesForecastForm.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (TransactionRequiredException ex) {
+            } catch (EntityExistsException | IllegalStateException | IllegalArgumentException | TransactionRequiredException ex) {
                 Logger.getLogger(SalesForecastForm.class.getName()).log(Level.SEVERE, null, ex);
             }
 
@@ -370,15 +392,7 @@ public class SalesForecastForm extends javax.swing.JFrame {
             // TODO add your handling code here:
             populateSalesForecast();
             placeSaleForecasts();
-        } catch (EntityExistsException ex) {
-            Logger.getLogger(SalesForecastForm.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalStateException ex) {
-            Logger.getLogger(SalesForecastForm.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalArgumentException ex) {
-            Logger.getLogger(SalesForecastForm.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (TransactionRequiredException ex) {
-            Logger.getLogger(SalesForecastForm.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
+        } catch (EntityExistsException | IllegalStateException | IllegalArgumentException | TransactionRequiredException | SQLException ex) {
             Logger.getLogger(SalesForecastForm.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jBtnSaleForecastRefreshActionPerformed
@@ -398,14 +412,14 @@ public class SalesForecastForm extends javax.swing.JFrame {
     private javax.swing.JButton jBtnSaleForecastEdit;
     private javax.swing.JButton jBtnSaleForecastRefresh;
     private javax.swing.JButton jBtnSaleForecastSave;
-    private javax.swing.JComboBox<String> jCmbMonths;
+    private javax.swing.JComboBox<String> jCmbSaleMonths;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextField jTFYear;
+    private javax.swing.JTextField jTFSaleYear;
     private javax.swing.JTable jTblSalesForecast;
     private javax.swing.JTextField jTfForecastSale;
     private javax.swing.JTextField jTfRealization;
@@ -437,31 +451,31 @@ public class SalesForecastForm extends javax.swing.JFrame {
     }
 
     private void clearSaleForecastFields() {
-        jCmbMonths.setSelectedIndex(0);
-        jTFYear.setText("");
+        jCmbSaleMonths.setSelectedIndex(0);
+        jTFSaleYear.setText("");
         jTfForecastSale.setText("");
         jTfRealization.setText("");
     }
 
     private void setSaleForecastFieldsEditable(boolean b) {
-        jCmbMonths.setEnabled(b);
-        jTFYear.setEditable(b);
+        jCmbSaleMonths.setEnabled(b);
+        jTFSaleYear.setEditable(b);
         jTfForecastSale.setEditable(b);
         jTfRealization.setEditable(b);
 
     }
 
     private void placeSaleForecastObjectToFields() {
-        jCmbMonths.setSelectedIndex(currentSaleForecast.getSelected_month() - 1);
-        jTFYear.setText("" + currentSaleForecast.getSelected_year());
-        jTfForecastSale.setText("" + currentSaleForecast.getIdSaleForecast());
+        jCmbSaleMonths.setSelectedIndex(currentSaleForecast.getSelected_month() - 1);
+        jTFSaleYear.setText("" + currentSaleForecast.getSelected_year());
+        jTfForecastSale.setText("" + currentSaleForecast.getForecastedSale());
         jTfRealization.setText("" + currentSaleForecast.getRealization());
     }
 
     private void populateSaleForecastObject() {
-        currentSaleForecast = new SaleForecast();
-        currentSaleForecast.setSelected_month(Integer.parseInt(jCmbMonths.getSelectedItem().toString()));
-        currentSaleForecast.setSelected_year(Integer.parseInt(jTFYear.getText()));
+
+        currentSaleForecast.setSelected_month(Integer.parseInt(jCmbSaleMonths.getSelectedItem().toString()));
+        currentSaleForecast.setSelected_year(Integer.parseInt(jTFSaleYear.getText()));
         currentSaleForecast.setForecastedSale(Integer.parseInt(jTfForecastSale.getText()));
         currentSaleForecast.setRealization(Integer.parseInt(jTfRealization.getText()));
     }

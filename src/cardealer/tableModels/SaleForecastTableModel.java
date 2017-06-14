@@ -17,7 +17,7 @@ public class SaleForecastTableModel extends DefaultTableModel{
     public SaleForecastTableModel(){
         super();
     }
-    public String[]columnNames={"idSaleForecast","Muaji","Viti","Shitja e Planifikuar","Realizimi","Data e Perfodimit"};
+    public String[]columnNames={"idSaleForecast","Muaji","Viti","Shitja e Planifikuar","Realizimi","Data e Përfudimit"};
 
 
  public int getColumnCount() {
@@ -34,17 +34,22 @@ public class SaleForecastTableModel extends DefaultTableModel{
     public SaleForecast getSelectedRow(int row){
         Vector v =(Vector) dataVector.get(row);
         
-        SaleForecast s = new SaleForecast();
-        Long id=(Long)v.get(0);
-        
+        SaleForecast sf = new SaleForecast();
+         
         Long idSaleForecast = (Long)v.get(0);
         int selected_month = (int)v.get(1);
         int selected_year = (int)v.get(2);;
         int forecastedSale = (int)v.get(3);;
         int realization = (int)v.get(4);
-        java.sql.Date done_date = (java.sql.Date)v.get(5);
+        
        
-        return s;
+        sf.setIdSaleForecast(idSaleForecast);
+        sf.setSelected_month(selected_month);
+        sf.setSelected_year(selected_year);
+        sf.setForecastedSale(forecastedSale);
+        sf.setRealization(realization);
+        
+        return sf;
     }
     @Override
     public Class getColumnClass(int s){

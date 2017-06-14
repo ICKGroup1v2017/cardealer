@@ -5,7 +5,7 @@
  */
 package cardealer;
 
-import cardealer.database.CarEntityFacade;
+import cardealer.database.CarsEntityFacade;
 import cardealer.database.Database;
 import cardealer.database.exceptions.EntityExistsException;
 import cardealer.models.Car;
@@ -34,7 +34,7 @@ public class CarForm extends javax.swing.JFrame {
 
     public static Database db;
     private Properties props;
-    private static CarEntityFacade cef;
+    private static CarsEntityFacade cef;
     private static ArrayList<Car> mCars;
     private static Car currentCar;
     private static final Logger LOG = Logger.getLogger(CarForm.class.getName());
@@ -67,6 +67,7 @@ public class CarForm extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(CarForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
+        this.setTitle("Regjistrimi i veturave");
         jTblCars.setModel(new CarTableModel());
         try {
             Path workingDirectory = Paths.get("").toAbsolutePath();
@@ -82,11 +83,11 @@ public class CarForm extends javax.swing.JFrame {
                 System.out.println("Trying to connect");
                 CarForm.db = new Database(props);
                 System.out.println("Connected");
-                cef = new CarEntityFacade();
+                cef = new CarsEntityFacade();
                 mCars = new ArrayList<>();
                 currentCar = new Car();
                 populateCars();
-
+                placeCars();
             }
         } catch (IOException | SQLException ex) {
             System.out.println(ex.getMessage());
@@ -150,7 +151,7 @@ public class CarForm extends javax.swing.JFrame {
         jBtnCarEdit = new javax.swing.JButton();
         jBtnCarSave = new javax.swing.JButton();
         jBtnRefresh = new javax.swing.JButton();
-        jBtnCancel = new javax.swing.JButton();
+        jBtnCarCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -170,16 +171,20 @@ public class CarForm extends javax.swing.JFrame {
         jLabel1.setText("Bërja:");
 
         jTFCarMake.setEditable(false);
+        jTFCarMake.setNextFocusableComponent(jTFCarModel);
 
         jLabel2.setText("Viti i prodhimit:");
 
         jLabel3.setText("Modeli:");
 
         jTFCarManufacturingYear.setEditable(false);
+        jTFCarManufacturingYear.setNextFocusableComponent(jBtnCarCreate);
 
         jTFCarModel.setEditable(false);
+        jTFCarModel.setNextFocusableComponent(jTFCarManufacturingYear);
 
         jBtnCarCreate.setText("Shto");
+        jBtnCarCreate.setNextFocusableComponent(jBtnCarEdit);
         jBtnCarCreate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jBtnCarCreateActionPerformed(evt);
@@ -188,6 +193,7 @@ public class CarForm extends javax.swing.JFrame {
 
         jBtnCarEdit.setText("Redakto");
         jBtnCarEdit.setEnabled(false);
+        jBtnCarEdit.setNextFocusableComponent(jBtnCarSave);
         jBtnCarEdit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jBtnCarEditActionPerformed(evt);
@@ -196,6 +202,7 @@ public class CarForm extends javax.swing.JFrame {
 
         jBtnCarSave.setText("Ruaj");
         jBtnCarSave.setEnabled(false);
+        jBtnCarSave.setNextFocusableComponent(jBtnRefresh);
         jBtnCarSave.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jBtnCarSaveActionPerformed(evt);
@@ -203,16 +210,17 @@ public class CarForm extends javax.swing.JFrame {
         });
 
         jBtnRefresh.setText("Rifresko");
+        jBtnRefresh.setNextFocusableComponent(jBtnCarCancel);
         jBtnRefresh.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jBtnRefreshActionPerformed(evt);
             }
         });
 
-        jBtnCancel.setText("Anulo");
-        jBtnCancel.addActionListener(new java.awt.event.ActionListener() {
+        jBtnCarCancel.setText("Anulo");
+        jBtnCarCancel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBtnCancelActionPerformed(evt);
+                jBtnCarCancelActionPerformed(evt);
             }
         });
 
@@ -240,7 +248,7 @@ public class CarForm extends javax.swing.JFrame {
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jBtnRefresh)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jBtnCancel)))
+                        .addComponent(jBtnCarCancel)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jBtnCarSave)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -266,7 +274,7 @@ public class CarForm extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jBtnRefresh)
-                            .addComponent(jBtnCancel))))
+                            .addComponent(jBtnCarCancel))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jTFCarManufacturingYear, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -303,6 +311,7 @@ public class CarForm extends javax.swing.JFrame {
         clearCarFields();
         setCarFieldsEditable(true);
         carInsertFlag = true;
+        jTFCarMake.requestFocus();
         jBtnCarCreate.setEnabled(false);
         jBtnCarSave.setEnabled(true);
     }//GEN-LAST:event_jBtnCarCreateActionPerformed
@@ -344,6 +353,7 @@ public class CarForm extends javax.swing.JFrame {
             jBtnCarEdit.setEnabled(false);
             jBtnCarSave.setEnabled(false);
             populateCars();
+            placeCars();
 
         }
     }//GEN-LAST:event_jBtnCarSaveActionPerformed
@@ -351,15 +361,21 @@ public class CarForm extends javax.swing.JFrame {
     private void jBtnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnRefreshActionPerformed
         // TODO add your handling code here:
         populateCars();
-    }//GEN-LAST:event_jBtnRefreshActionPerformed
-
-    private void jBtnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnCancelActionPerformed
+        placeCars();
         jBtnCarCreate.setEnabled(true);
         jBtnCarEdit.setEnabled(false);
         jBtnCarSave.setEnabled(false);
         clearCarFields();
         setCarFieldsEditable(false);
-    }//GEN-LAST:event_jBtnCancelActionPerformed
+    }//GEN-LAST:event_jBtnRefreshActionPerformed
+
+    private void jBtnCarCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnCarCancelActionPerformed
+        jBtnCarCreate.setEnabled(true);
+        jBtnCarEdit.setEnabled(false);
+        jBtnCarSave.setEnabled(false);
+        clearCarFields();
+        setCarFieldsEditable(false);
+    }//GEN-LAST:event_jBtnCarCancelActionPerformed
 
     private void clearCarFields() {
         this.jTFCarMake.setText("");
@@ -385,30 +401,33 @@ public class CarForm extends javax.swing.JFrame {
         currentCar.setManufacturingYear(Integer.parseInt(this.jTFCarManufacturingYear.getText()));
     }
 
+    private void placeCars() {
+        DefaultTableModel tableModel = (DefaultTableModel) jTblCars.getModel();
+        tableModel.getDataVector().clear();
+        Vector v = new Vector();
+        for (Car c : mCars) {
+            v = new Vector();
+            v.add(c.getId());
+            v.add(c.getMake());
+            v.add(c.getModel());
+            v.add(c.getManufacturingYear().toString());
+
+            tableModel.addRow(v);
+
+        }
+        jTblCars.setModel(tableModel);
+    }
+
     private static void populateCars() {
         try {
             mCars = cef.reads();
 
-            DefaultTableModel tableModel = (DefaultTableModel) jTblCars.getModel();
-            tableModel.getDataVector().clear();
-            Vector v = new Vector();
-            for (Car c : mCars) {
-                v = new Vector();
-                v.add(c.getId());
-                v.add(c.getMake());
-                v.add(c.getModel());
-                v.add(c.getManufacturingYear().toString());
-
-                tableModel.addRow(v);
-
-            }
-            jTblCars.setModel(tableModel);
         } catch (EntityExistsException | IllegalStateException | IllegalArgumentException | TransactionRequiredException | SQLException ex) {
             Logger.getLogger(CarForm.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jBtnCancel;
+    private javax.swing.JButton jBtnCarCancel;
     private javax.swing.JButton jBtnCarCreate;
     private javax.swing.JButton jBtnCarEdit;
     private javax.swing.JButton jBtnCarSave;

@@ -22,7 +22,7 @@ import java.util.ArrayList;
  *
  * @author ahmet
  */
-public class CarEntityFacade {
+public class CarsEntityFacade {
 
     /**
      * This method serves to create a new record based on the passed entity
@@ -52,7 +52,7 @@ public class CarEntityFacade {
                 stmt.setString(2, entity.getModel());
                 stmt.setInt(3, entity.getManufacturingYear());
 
-                res = stmt.execute(create);
+                res = stmt.executeUpdate()>0;
                 db.conn.commit();
             } catch (SQLException ex) {
                 if (db.conn != null) {
@@ -104,24 +104,24 @@ public class CarEntityFacade {
 
     public boolean update(Car entity) throws IllegalStateException, IllegalArgumentException, TransactionRequiredException, SQLException {
         boolean res = false;
-        String create = "UPDATE `cardealer`.`car`\n"
+        String update = "UPDATE `cardealer`.`car`\n"
                 + "SET\n" 
                 + "`make` = ?,\n"
                 + "`model` = ?,\n"
-                + "`manufacturingYear` = ?>\n"
-                + "WHERE `id` = ?;\n";
+                + "`manufacturingYear` = ?\n"
+                + " WHERE `id` = ?;\n";
 
         Connection connection = db.conn;
         connection.setAutoCommit(false);
         if (!connection.isClosed()) {
-            PreparedStatement stmt = connection.prepareStatement(create);
+            PreparedStatement stmt = connection.prepareStatement(update);
             try {
 
                 stmt.setString(1, entity.getMake());
                 stmt.setString(2, entity.getModel());
                 stmt.setInt(3, entity.getManufacturingYear());
-
-                res = stmt.execute(create);
+                stmt.setLong(4, entity.getId());
+                res = stmt.executeUpdate()>0;
                 db.conn.commit();
             } catch (SQLException ex) {
                 if (db.conn != null) {

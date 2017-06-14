@@ -6,7 +6,6 @@
 package cardealer.models;
  
  
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -131,17 +130,11 @@ public class Car  implements Comparable<Car> {
         if (!Objects.equals(this.id, other.id)) {
             return false;
         }
-        if (!Objects.equals(this.manufacturingYear, other.manufacturingYear)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(this.manufacturingYear, other.manufacturingYear);
     }
 
     @Override
     public String toString() {
         return "Car{" + "nl=" + nl + ", id=" + id + ", make=" + make + ", model=" + model + ", manufacturingYear=" + manufacturingYear + '}';
     }
-
-     
-
 }
