@@ -5,17 +5,72 @@
  */
 package cardealer;
 
+import cardealer.database.CarsEntityFacade;
+import cardealer.database.exceptions.EntityExistsException;
+import cardealer.models.Car;
+import java.awt.print.PrinterException;
+import cardealer.database.SalesEntityFacade;
+import cardealer.database.SalesEntityFacade;
+import cardealer.database.exceptions.EntityExistsException;
+import cardealer.models.Car;
+import cardealer.models.Sale;
+import cardealer.tableModels.SaleTableModel;
+import java.awt.event.KeyEvent;
+import java.sql.SQLException;
+import java.text.DecimalFormat;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Properties;
+import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
+import javax.transaction.TransactionRequiredException;
+
 /**
  *
  * @author ahmet
  */
-public class SalesForm extends javax.swing.JPanel {
+public class SalesForm
+        extends javax.swing.JFrame {
+
+    private CarsEntityFacade cef;
+    private Car currentCar;
+    private ArrayList<Car> mCars;
+    private String zeroValue = "0.00";
+    private Sale currentSale;
+    private ArrayList<Sale> mSales;
+    private SalesEntityFacade sef;
+    private boolean saleInsertFlag;
 
     /**
-     * Creates new form SalesForm
+     * Creates new form SalesForm]
      */
     public SalesForm() {
         initComponents();
+        this.setTitle("Regjistrimi i shitjes së veturave");
+        jTblSales.setModel(new SaleTableModel());
+        mSales = new ArrayList<>();
+        currentSale = new Sale();
+        mSales = new ArrayList<>();
+        currentSale = new Sale();
+        sef = new SalesEntityFacade();
+        cef = new CarsEntityFacade();
+        try {
+
+            populateCars();
+            populateSales();
+            placeSales();
+            clearSaleFields();
+            setSaleFieldsEditable(false);
+            this.pack();
+            this.setVisible(true);
+        } catch (IllegalStateException | IllegalArgumentException | TransactionRequiredException | EntityExistsException | SQLException ex) {
+            Logger.getLogger(SalesForm.class.getName()).log(Level.SEVERE, null, ex);
+            System.err.println("Error:");
+            System.exit(-30);
+        }
     }
 
     /**
@@ -27,19 +82,523 @@ public class SalesForm extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTblSales = new javax.swing.JTable();
+        jLabel1 = new javax.swing.JLabel();
+        jTfSaleConsumerFirstName = new javax.swing.JTextField();
+        jLabel2 = new javax.swing.JLabel();
+        jTfSaleConsumerLastName = new javax.swing.JTextField();
+        jTfSalePrice = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
+        jCmbSaleCar = new javax.swing.JComboBox<>();
+        jLabel4 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        jTfSalePayment = new javax.swing.JTextField();
+        jLabel6 = new javax.swing.JLabel();
+        jTfSaleSale_date = new javax.swing.JTextField();
+        jLabel7 = new javax.swing.JLabel();
+        jTfSalePaid_date = new javax.swing.JTextField();
+        jLabel8 = new javax.swing.JLabel();
+        jTfSaleDebt = new javax.swing.JTextField();
+        jCkhBSaleStatus = new javax.swing.JCheckBox();
+        jLabel9 = new javax.swing.JLabel();
+        jBtnSaleCreate = new javax.swing.JButton();
+        jBtnSaleEdit = new javax.swing.JButton();
+        jBtnSaleSave = new javax.swing.JButton();
+        jBtnSaleShtyp = new javax.swing.JButton();
+        jBtnSaleCancel = new javax.swing.JButton();
+        jBtnSaleRefresh = new javax.swing.JButton();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        jTblSales.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane1.setViewportView(jTblSales);
+
+        jLabel1.setText("Emri i konsumatorit: ");
+
+        jTfSaleConsumerFirstName.setText("jTextField1");
+        jTfSaleConsumerFirstName.setNextFocusableComponent(jTfSaleConsumerLastName);
+
+        jLabel2.setText("Mbiemri i konsumatorit: ");
+
+        jTfSaleConsumerLastName.setText("jTextField1");
+        jTfSaleConsumerLastName.setNextFocusableComponent(jCmbSaleCar);
+
+        jTfSalePrice.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        jTfSalePrice.setText("0.00");
+        jTfSalePrice.setNextFocusableComponent(jTfSalePayment);
+
+        jLabel3.setText("Çmimi:");
+
+        jCmbSaleCar.setNextFocusableComponent(jTfSalePrice);
+        jCmbSaleCar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCmbSaleCarActionPerformed(evt);
+            }
+        });
+
+        jLabel4.setText("Vetura: ");
+
+        jLabel5.setText("Paguar: ");
+
+        jTfSalePayment.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        jTfSalePayment.setText("0.00");
+        jTfSalePayment.setNextFocusableComponent(jTfSaleDebt);
+        jTfSalePayment.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                jTfSalePaymentKeyReleased(evt);
+            }
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jTfSalePaymentKeyTyped(evt);
+            }
+        });
+
+        jLabel6.setText("Data e shitjes: ");
+
+        jTfSaleSale_date.setText("jTextField1");
+        jTfSaleSale_date.setNextFocusableComponent(jTfSalePaid_date);
+
+        jLabel7.setText("Data e pagesës");
+
+        jTfSalePaid_date.setText("jTextField1");
+        jTfSalePaid_date.setNextFocusableComponent(jCkhBSaleStatus);
+
+        jLabel8.setText("Borxhi: ");
+
+        jTfSaleDebt.setEditable(false);
+        jTfSaleDebt.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        jTfSaleDebt.setText("0.00");
+        jTfSaleDebt.setNextFocusableComponent(jTfSaleSale_date);
+
+        jCkhBSaleStatus.setText("Aktive");
+        jCkhBSaleStatus.setNextFocusableComponent(jBtnSaleCreate);
+
+        jLabel9.setText("Status:");
+
+        jBtnSaleCreate.setText("Shto");
+        jBtnSaleCreate.setNextFocusableComponent(jBtnSaleEdit);
+        jBtnSaleCreate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnSaleCreateActionPerformed(evt);
+            }
+        });
+
+        jBtnSaleEdit.setText("Redakto");
+        jBtnSaleEdit.setEnabled(false);
+        jBtnSaleEdit.setNextFocusableComponent(jBtnSaleRefresh);
+        jBtnSaleEdit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnSaleEditActionPerformed(evt);
+            }
+        });
+
+        jBtnSaleSave.setText("Ruaj");
+        jBtnSaleSave.setEnabled(false);
+        jBtnSaleSave.setNextFocusableComponent(jBtnSaleRefresh);
+        jBtnSaleSave.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnSaleSaveActionPerformed(evt);
+            }
+        });
+
+        jBtnSaleShtyp.setText("Shtyp");
+        jBtnSaleShtyp.setToolTipText("E shtyp listën e veturave");
+        jBtnSaleShtyp.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnSaleShtypActionPerformed(evt);
+            }
+        });
+
+        jBtnSaleCancel.setText("Anulo");
+        jBtnSaleCancel.setNextFocusableComponent(jBtnSaleShtyp);
+        jBtnSaleCancel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnSaleCancelActionPerformed(evt);
+            }
+        });
+
+        jBtnSaleRefresh.setText("Rifresko");
+        jBtnSaleRefresh.setNextFocusableComponent(jBtnSaleCancel);
+        jBtnSaleRefresh.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnSaleRefreshActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jScrollPane1)
+                        .addContainerGap())
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                .addComponent(jLabel1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTfSaleConsumerFirstName, javax.swing.GroupLayout.PREFERRED_SIZE, 164, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabel2)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTfSaleConsumerLastName, javax.swing.GroupLayout.PREFERRED_SIZE, 164, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                .addComponent(jLabel6)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTfSaleSale_date, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabel7)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTfSalePaid_date, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabel9)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jCkhBSaleStatus)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(jBtnSaleCreate)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(jBtnSaleEdit))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(jBtnSaleRefresh)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jBtnSaleCancel)))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jBtnSaleSave)
+                                    .addComponent(jBtnSaleShtyp)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel4)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jCmbSaleCar, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabel3)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTfSalePrice, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel5)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTfSalePayment, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabel8)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTfSaleDebt, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addContainerGap(187, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 281, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(jTfSaleConsumerFirstName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel2)
+                    .addComponent(jTfSaleConsumerLastName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(jTfSalePrice, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel5)
+                    .addComponent(jTfSalePayment, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel4)
+                    .addComponent(jCmbSaleCar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel8)
+                    .addComponent(jTfSaleDebt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel9)
+                            .addComponent(jLabel6)
+                            .addComponent(jTfSaleSale_date, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel7)
+                            .addComponent(jTfSalePaid_date, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jCkhBSaleStatus)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(20, 20, 20)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jBtnSaleCreate)
+                            .addComponent(jBtnSaleEdit)
+                            .addComponent(jBtnSaleSave))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jBtnSaleRefresh)
+                            .addComponent(jBtnSaleCancel)
+                            .addComponent(jBtnSaleShtyp))))
+                .addContainerGap(38, Short.MAX_VALUE))
         );
+
+        pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void jBtnSaleCreateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnSaleCreateActionPerformed
+        // TODO add your handling code here:
+        clearSaleFields();
+        setSaleFieldsEditable(true);
+        saleInsertFlag = true;
+        jTfSaleConsumerFirstName.requestFocus();
+        jBtnSaleCreate.setEnabled(false);
+        jBtnSaleSave.setEnabled(true);
+
+    }//GEN-LAST:event_jBtnSaleCreateActionPerformed
+
+    private void jBtnSaleEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnSaleEditActionPerformed
+        // TODO add your handling code here:
+        if (jTblSales.getSelectedRowCount() == 1) {
+            int index = jTblSales.getSelectedRow();
+            SaleTableModel d = ((SaleTableModel) jTblSales.getModel());
+            currentSale = d.getSelectedRow(index);
+            placeSaleObjectToFields();
+            setSaleFieldsEditable(true);
+            jBtnSaleCreate.setEnabled(false);
+            jBtnSaleSave.setEnabled(true);
+            jBtnSaleEdit.setEnabled(false);
+            saleInsertFlag = false;
+        }
+    }//GEN-LAST:event_jBtnSaleEditActionPerformed
+
+    private void jBtnSaleSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnSaleSaveActionPerformed
+        // TODO add your handling code here:
+        populateSaleObject();
+        boolean res = false;
+        try {
+            if (saleInsertFlag) {
+                res = sef.create(currentSale);
+
+            } else {
+                res = sef.update(currentSale);
+            }
+            setSaleFieldsEditable(false);
+            clearSaleFields();
+
+            if (res) {
+
+                jBtnSaleCreate.setEnabled(true);
+                jBtnSaleEdit.setEnabled(false);
+                jBtnSaleSave.setEnabled(false);
+                populateSales();
+                placeSales();
+
+            }
+
+        } catch (SQLException
+                | EntityExistsException | IllegalStateException | IllegalArgumentException | TransactionRequiredException ex) {
+            System.out.println(ex.getMessage());
+            Logger.getLogger(SalesForm.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jBtnSaleSaveActionPerformed
+
+    private void jBtnSaleShtypActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnSaleShtypActionPerformed
+        try {
+            // TODO add your handling code here:
+            MessageFormat header = new MessageFormat("Lista e veturave");
+            MessageFormat footer = new MessageFormat("Faqja {0,number,integer}");
+
+            jTblSales.print(JTable.PrintMode.FIT_WIDTH, header, footer);
+        } catch (PrinterException ex) {
+            Logger.getLogger(SalesForm.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jBtnSaleShtypActionPerformed
+
+    private void jBtnSaleCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnSaleCancelActionPerformed
+        jBtnSaleCreate.setEnabled(true);
+        jBtnSaleEdit.setEnabled(false);
+        jBtnSaleSave.setEnabled(false);
+        clearSaleFields();
+        setSaleFieldsEditable(false);
+    }//GEN-LAST:event_jBtnSaleCancelActionPerformed
+
+    private void jBtnSaleRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnSaleRefreshActionPerformed
+        try {
+            // TODO add your handling code here:
+            populateSales();
+            placeSales();
+            jBtnSaleCreate.setEnabled(true);
+            jBtnSaleEdit.setEnabled(false);
+            jBtnSaleSave.setEnabled(false);
+            clearSaleFields();
+            setSaleFieldsEditable(false);
+        } catch (Exception ex) {
+            Logger.getLogger(SalesForm.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jBtnSaleRefreshActionPerformed
+
+    private void jCmbSaleCarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCmbSaleCarActionPerformed
+        // TODO add your handling code here:
+        if (jCmbSaleCar.getSelectedIndex() > -1) {
+            currentCar = (Car) jCmbSaleCar.getSelectedItem();
+            jTfSalePrice.setText(currentCar.getPrice().toString());
+            Double d = Double.parseDouble(jTfSalePayment.getText());
+            Double r = d - currentCar.getPrice();
+            DecimalFormat  df = new DecimalFormat("0.00");
+            jTfSaleDebt.setText (df.format(r));
+        }
+    }//GEN-LAST:event_jCmbSaleCarActionPerformed
+
+    private void jTfSalePaymentKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTfSalePaymentKeyTyped
+        // TODO add your handling code here:
+        System.out.println(evt.getExtendedKeyCode());
+        if (evt.getKeyCode() == 13) {
+            jTfSalePayment.setText("0.00");
+        } else {
+            String value = this.jTfSalePayment.getText();
+            Double dValue = Double.parseDouble(value);
+
+            double res = currentCar.getPrice() - dValue;
+            if (res <= 0) {
+                res *= -1;
+            }
+            DecimalFormat df = new DecimalFormat("00.000");
+
+            this.jTfSaleDebt.setText(df.format(res));
+        }
+    }//GEN-LAST:event_jTfSalePaymentKeyTyped
+
+    private void jTfSalePaymentKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTfSalePaymentKeyReleased
+        // TODO add your handling code here:
+
+        if (evt.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
+            //code to execute if backspace is pressed
+        }
+
+        if (evt.getKeyCode() == KeyEvent.VK_ESCAPE) {
+            //code to execute if escape is pressed
+            jTfSalePayment.setText("0.00");
+        }
+    }//GEN-LAST:event_jTfSalePaymentKeyReleased
+
+    private void populateCars() throws EntityExistsException, IllegalStateException,
+            IllegalArgumentException, TransactionRequiredException, SQLException {
+        mCars = cef.reads();
+        mCars.forEach((mcar) -> {
+            jCmbSaleCar.addItem(mcar);
+        });
+    }
+
+    private void populateSales() throws EntityExistsException, IllegalStateException,
+            IllegalArgumentException, TransactionRequiredException, SQLException {
+        mSales = sef.reads();
+    }
+
+    private void placeSales() {
+        DefaultTableModel tableModel = (DefaultTableModel) jTblSales.getModel();
+        tableModel.getDataVector().clear();
+        Vector v = new Vector();
+        for (Sale s : mSales) {
+            v = new Vector();
+            v.add(s.getIdSale());
+            v.add(s.getFirstName());
+            v.add(s.getLastName());
+            v.add(s.getCar_id().toString());
+            v.add(s.getPrice());
+            v.add(s.getPayment());
+            v.add(s.getDebt());
+            v.add(s.getSale_date());
+            v.add(s.getPaid_date());
+            v.add(s.isStatus());
+            tableModel.addRow(v);
+
+        }
+        jTblSales.setModel(tableModel);
+    }
+
+    private void clearSaleFields() {
+        this.jTfSaleConsumerFirstName.setText("");
+        this.jTfSaleConsumerLastName.setText("");
+        this.jCmbSaleCar.setSelectedIndex(-1);
+        this.jTfSalePrice.setText("");
+        this.jTfSalePayment.setText("");
+        this.jTfSaleDebt.setText("");
+        this.jTfSaleSale_date.setText("");
+        this.jTfSalePaid_date.setText("");
+        this.jCkhBSaleStatus.setSelected(false);
+        jTfSalePrice.setText(zeroValue);
+        jTfSaleDebt.setText(zeroValue);
+        jTfSalePayment.setText(zeroValue);
+    }
+
+    private void setSaleFieldsEditable(boolean b) {
+        this.jTfSaleConsumerFirstName.setEditable(b);
+        this.jTfSaleConsumerLastName.setEditable(b);
+        this.jCmbSaleCar.setEnabled(b);
+        this.jTfSalePrice.setEditable(b);
+        this.jTfSalePayment.setEditable(b);
+        this.jTfSaleDebt.setEditable(b);
+        this.jTfSaleSale_date.setEditable(b);
+        this.jTfSalePaid_date.setEditable(b);
+        this.jCkhBSaleStatus.setEnabled(false);
+    }
+
+    private void placeSaleObjectToFields() {
+        this.jTfSaleConsumerFirstName.setText(currentSale.getFirstName());
+        this.jTfSaleConsumerLastName.setText(currentSale.getLastName());
+        this.jCmbSaleCar.setSelectedItem(this.currentSale.getCar_id());
+        this.jTfSalePrice.setText(currentSale.getPrice().toString());
+        this.jTfSalePayment.setText(currentSale.getPayment().toString());
+        this.jTfSaleDebt.setText(currentSale.getDebt().toString());
+        this.jTfSaleSale_date.setText(currentSale.getSale_date().toString());
+        this.jTfSalePaid_date.setText(currentSale.getPaid_date().toString());
+        this.jCkhBSaleStatus.setSelected(currentSale.isStatus());
+    }
+
+    private void populateSaleObject() {
+        currentSale.setFirstName(this.jTfSaleConsumerFirstName.getText());
+        currentSale.setLastName(this.jTfSaleConsumerLastName.getText());
+        currentSale.setCar_id((Car) this.jCmbSaleCar.getSelectedItem());
+        currentSale.setPrice(Double.parseDouble(this.jTfSalePrice.getText()));
+        currentSale.setPayment(Double.parseDouble(this.jTfSalePayment.getText()));
+        currentSale.setDebt(Double.parseDouble(this.jTfSaleDebt.getText()));
+//        currentSale.setSale_date(this.jTfSaleSale_date.getText().toString());
+        // currentSale.setPaid_date(Date this.jTfSalePaid_date.getText(currentSale.getPaid_date().toString());
+        currentSale.setStatus(this.jCkhBSaleStatus.isSelected());
+        if(currentSale.getCar_id().getPrice().compareTo(currentSale.getPayment()) == 0d){
+            currentSale.setPaid_date(currentSale.getSale_date());
+        }
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jBtnSaleCancel;
+    private javax.swing.JButton jBtnSaleCreate;
+    private javax.swing.JButton jBtnSaleEdit;
+    private javax.swing.JButton jBtnSaleRefresh;
+    private javax.swing.JButton jBtnSaleSave;
+    private javax.swing.JButton jBtnSaleShtyp;
+    private javax.swing.JCheckBox jCkhBSaleStatus;
+    private javax.swing.JComboBox<Car> jCmbSaleCar;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTable jTblSales;
+    private javax.swing.JTextField jTfSaleConsumerFirstName;
+    private javax.swing.JTextField jTfSaleConsumerLastName;
+    private javax.swing.JTextField jTfSaleDebt;
+    private javax.swing.JTextField jTfSalePaid_date;
+    private javax.swing.JTextField jTfSalePayment;
+    private javax.swing.JTextField jTfSalePrice;
+    private javax.swing.JTextField jTfSaleSale_date;
     // End of variables declaration//GEN-END:variables
+
 }
