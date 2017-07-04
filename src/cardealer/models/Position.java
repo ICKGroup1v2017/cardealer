@@ -17,17 +17,17 @@ public class Position {
     private Long idPosition;
     private String title;
     private String description;
-    private boolean status;
     private java.sql.Date startDate;
     private java.sql.Date endDate;
+    private boolean status;
 
     public Position() {
         this.idPosition = 0L;
         this.title = "";
         this.description = "";
-        this.status = false;
-        this.startDate = new  Date(new java.util.Date().getTime());
+        this.startDate = new Date(new java.util.Date().getTime());
         this.endDate = null;
+        this.status = false;
     }
 
     public Position(Long idPosition, String title, String description) {
@@ -37,15 +37,22 @@ public class Position {
         this.description = description;
     }
 
-    
-    public Position(Long idPosition, String title, String description, boolean status, Date startDate, Date endDate) {
+    public Position(Long idPosition, String title, String description, Date startDate) {
         this();
         this.idPosition = idPosition;
         this.title = title;
         this.description = description;
-        this.status = status;
         this.startDate = startDate;
-        this.endDate = endDate;
+    }
+
+    public Position(Long idPosition, String title, String description, Date startDate, Date endDate, boolean status) {
+        this();
+        this.idPosition = idPosition;
+        this.title = title;
+        this.description = description;
+        this.startDate = startDate;
+        this.endDate = endDate; 
+        this.status = status;
     }
 
     public Long getIdPosition() {
@@ -72,14 +79,7 @@ public class Position {
         this.description = description;
     }
 
-    public boolean isStatus() {
-        return status;
-    }
-
-    public void setStatus(boolean status) {
-        this.status = status;
-    }
-
+   
     public Date getStartDate() {
         return startDate;
     }
@@ -96,6 +96,13 @@ public class Position {
         this.endDate = endDate;
     }
 
+     public boolean isStatus() {
+        return status;
+    }
+
+    public void setStatus(boolean status) {
+        this.status = status;
+    }
     @Override
     public int hashCode() {
         int hash = 3;
@@ -140,8 +147,7 @@ public class Position {
 
     @Override
     public String toString() {
-        return  title ;
+        return title;
     }
 
-    
 }

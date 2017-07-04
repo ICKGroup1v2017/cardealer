@@ -5,7 +5,7 @@
  */
 package cardealer.database;
 
-import static cardealer.EmployeesForm.db;
+import static cardealer.Main.db;
 import cardealer.database.exceptions.EntityExistsException;
 import cardealer.database.exceptions.PersistenceException;
 import cardealer.models.Gender;

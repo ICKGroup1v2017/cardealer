@@ -1,6 +1,6 @@
 package cardealer.database;
 
-import static cardealer.EmployeesForm.db;
+import static cardealer.Main.db;
 import cardealer.database.GendersEntityFacade;
 import cardealer.database.exceptions.EntityExistsException;
 import cardealer.database.exceptions.PersistenceException;
@@ -80,6 +80,7 @@ public class EmployeesEntityFacade {
                     GendersEntityFacade gef = new GendersEntityFacade();
                     g = gef.read(rs.getInt("genderID"));
                     e = new Employee(rs.getLong("idEmployee"),
+                            rs.getString("personalId"),
                             rs.getString("firstName"), 
                             rs.getString("middleName"), 
                             rs.getString("lastName"),
@@ -104,12 +105,12 @@ public class EmployeesEntityFacade {
                     Gender g = new Gender(rs.getInt("genderID"));
                     GendersEntityFacade gef = new GendersEntityFacade();
                     g = gef.read(rs.getInt("genderID"));
-                    Employee inst = new Employee(
-                            rs.getLong("idEmployee"),
-                            rs.getString("firstName"),
-                            rs.getString("middleName"),
+                    Employee inst =  new Employee(rs.getLong("idEmployee"),
+                            rs.getString("personalId"),
+                            rs.getString("firstName"), 
+                            rs.getString("middleName"), 
                             rs.getString("lastName"),
-                            g,
+                            g, 
                             rs.getDate("hiringDate"));
                     mEmployees.add(inst);
                 }

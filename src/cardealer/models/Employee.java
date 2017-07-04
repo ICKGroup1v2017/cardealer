@@ -17,6 +17,7 @@ import java.util.function.Consumer;
 public class Employee {
 
     private Long idEmployee;
+    private String personalId;
     private String firstName;
     private String middleName;
     private String lastName;
@@ -26,17 +27,19 @@ public class Employee {
 
     public Employee() {
         this.idEmployee = 0L;
+        this.personalId = "";
         this.firstName = "";
         this.middleName = "";
         this.lastName = "";
         this.genderID = new Gender();
         this.hiringDate = new java.sql.Date(new java.util.Date().getTime());
         this.positions = new ArrayList<>();
-            
+
     }
 
-    public Employee(Long idEmployee, String firstName, String middleName, String lastName, Gender genderID, Date hiringDate) {
+    public Employee(Long idEmployee, String personalId, String firstName, String middleName, String lastName, Gender genderID, Date hiringDate) {
         this.idEmployee = idEmployee;
+        this.personalId = personalId;
         this.firstName = firstName;
         this.middleName = middleName;
         this.lastName = lastName;
@@ -50,6 +53,14 @@ public class Employee {
 
     public void setIdEmployee(Long idEmployee) {
         this.idEmployee = idEmployee;
+    }
+
+    public String getPersonalId() {
+        return this.personalId;
+    }
+
+    public void setPersonalId(String personalId) {
+        this.personalId = personalId;
     }
 
     public String getFirstName() {
@@ -93,9 +104,9 @@ public class Employee {
     }
 
     public boolean addAPosition(Position pos) {
-        
+
         positions.stream().filter((position) -> {
-            return position.getEndDate()!=null;
+            return position.getEndDate() != null;
         }).map((Position position) -> {
             position.setEndDate(new java.sql.Date(new java.util.Date().getTime()));
             return position;
@@ -104,15 +115,13 @@ public class Employee {
             public void accept(Position position) {
                 position.setStatus(false);
             }
-        }); 
+        });
         return this.positions.add(pos);
     }
 
     public void setPositions(ArrayList<Position> positions) {
         this.positions = positions;
     }
-    
-    
 
     @Override
     public int hashCode() {
@@ -158,12 +167,8 @@ public class Employee {
 
     @Override
     public String toString() {
-        return   idEmployee + " | " + firstName + 
-                (middleName.length()>0?middleName + " ":"") + lastName + "\nData e punësimi: " + hiringDate + '}';
+        return idEmployee + " | " + firstName
+                + (middleName.length() > 0 ? middleName + " " : "") + lastName + "\nData e punësimi: " + hiringDate + '}';
     }
-    
-    
-    
-    
-    
+
 }

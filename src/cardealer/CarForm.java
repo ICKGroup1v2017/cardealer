@@ -12,17 +12,20 @@ import cardealer.models.Car;
 import cardealer.tableModels.CarTableModel;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.print.PrinterException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Properties;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import javax.transaction.TransactionRequiredException;
 
@@ -152,6 +155,11 @@ public class CarForm extends javax.swing.JFrame {
         jBtnCarSave = new javax.swing.JButton();
         jBtnRefresh = new javax.swing.JButton();
         jBtnCarCancel = new javax.swing.JButton();
+        jBtnShtyp = new javax.swing.JButton();
+        jLabel4 = new javax.swing.JLabel();
+        jTFCarPrice = new javax.swing.JTextField();
+        jChkBCarStatus = new javax.swing.JCheckBox();
+        jLabel5 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -173,12 +181,12 @@ public class CarForm extends javax.swing.JFrame {
         jTFCarMake.setEditable(false);
         jTFCarMake.setNextFocusableComponent(jTFCarModel);
 
-        jLabel2.setText("Viti i prodhimit:");
+        jLabel2.setText("Viti i prodhimit: ");
 
-        jLabel3.setText("Modeli:");
+        jLabel3.setText("Modeli: ");
 
         jTFCarManufacturingYear.setEditable(false);
-        jTFCarManufacturingYear.setNextFocusableComponent(jBtnCarCreate);
+        jTFCarManufacturingYear.setNextFocusableComponent(jTFCarPrice);
 
         jTFCarModel.setEditable(false);
         jTFCarModel.setNextFocusableComponent(jTFCarManufacturingYear);
@@ -224,21 +232,56 @@ public class CarForm extends javax.swing.JFrame {
             }
         });
 
+        jBtnShtyp.setText("Shtyp");
+        jBtnShtyp.setToolTipText("E shtyp listën e veturave");
+        jBtnShtyp.setNextFocusableComponent(jBtnCarCancel);
+        jBtnShtyp.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnShtypActionPerformed(evt);
+            }
+        });
+
+        jLabel4.setText("Çmimi:");
+
+        jTFCarPrice.setEditable(false);
+        jTFCarPrice.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        jTFCarPrice.setText("0.00");
+        jTFCarPrice.setNextFocusableComponent(jBtnCarCreate);
+
+        jChkBCarStatus.setText("Aktive");
+        jChkBCarStatus.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jChkBCarStatusActionPerformed(evt);
+            }
+        });
+
+        jLabel5.setText("Status: ");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(58, 58, 58)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.TRAILING))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jTFCarMake, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTFCarModel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTFCarManufacturingYear, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.TRAILING))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jTFCarMake, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jTFCarModel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jTFCarManufacturingYear, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel4)
+                            .addComponent(jLabel5))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jChkBCarStatus)
+                            .addComponent(jTFCarPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
@@ -250,8 +293,10 @@ public class CarForm extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jBtnCarCancel)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jBtnCarSave)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jBtnCarSave)
+                    .addComponent(jBtnShtyp))
+                .addContainerGap(397, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -274,12 +319,21 @@ public class CarForm extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jBtnRefresh)
-                            .addComponent(jBtnCarCancel))))
+                            .addComponent(jBtnCarCancel)
+                            .addComponent(jBtnShtyp))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jTFCarManufacturingYear, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2))
-                .addContainerGap(77, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jTFCarPrice, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel4))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel5)
+                    .addComponent(jChkBCarStatus))
+                .addContainerGap(27, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -377,6 +431,22 @@ public class CarForm extends javax.swing.JFrame {
         setCarFieldsEditable(false);
     }//GEN-LAST:event_jBtnCarCancelActionPerformed
 
+    private void jBtnShtypActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnShtypActionPerformed
+        try {
+            // TODO add your handling code here:
+            MessageFormat header = new MessageFormat ("Lista e veturave");
+            MessageFormat footer = new MessageFormat("Faqja {0,number,integer}");
+            
+            jTblCars.print(JTable.PrintMode.FIT_WIDTH, header, footer);
+        } catch (PrinterException ex) {
+            Logger.getLogger(CarForm.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jBtnShtypActionPerformed
+
+    private void jChkBCarStatusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jChkBCarStatusActionPerformed
+        jChkBCarStatus.setText(this.jChkBCarStatus.isSelected()?"Aktive":"Pasive");
+    }//GEN-LAST:event_jChkBCarStatusActionPerformed
+
     private void clearCarFields() {
         this.jTFCarMake.setText("");
         this.jTFCarModel.setText("");
@@ -393,12 +463,15 @@ public class CarForm extends javax.swing.JFrame {
         this.jTFCarMake.setText(currentCar.getMake());
         this.jTFCarModel.setText(currentCar.getModel());
         this.jTFCarManufacturingYear.setText(currentCar.getManufacturingYear().toString());
+        this.jTFCarPrice.setText(currentCar.getPrice().toString());
     }
 
     private void populateCarObject() {
         currentCar.setMake(this.jTFCarMake.getText());
         currentCar.setModel(this.jTFCarModel.getText());
         currentCar.setManufacturingYear(Integer.parseInt(this.jTFCarManufacturingYear.getText()));
+        currentCar.setPrice(Double.parseDouble(jTFCarPrice.getText()));
+        currentCar.setStatus(this.jChkBCarStatus.isSelected());
     }
 
     private void placeCars() {
@@ -407,11 +480,12 @@ public class CarForm extends javax.swing.JFrame {
         Vector v = new Vector();
         for (Car c : mCars) {
             v = new Vector();
-            v.add(c.getId());
+            v.add(c.getIdCar());
             v.add(c.getMake());
             v.add(c.getModel());
             v.add(c.getManufacturingYear().toString());
-
+            v.add(c.getPrice().toString());
+            v.add(c.isStatus());
             tableModel.addRow(v);
 
         }
@@ -432,14 +506,19 @@ public class CarForm extends javax.swing.JFrame {
     private javax.swing.JButton jBtnCarEdit;
     private javax.swing.JButton jBtnCarSave;
     private javax.swing.JButton jBtnRefresh;
+    private javax.swing.JButton jBtnShtyp;
+    private javax.swing.JCheckBox jChkBCarStatus;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextField jTFCarMake;
     private javax.swing.JTextField jTFCarManufacturingYear;
     private javax.swing.JTextField jTFCarModel;
+    private javax.swing.JTextField jTFCarPrice;
     private static javax.swing.JTable jTblCars;
     // End of variables declaration//GEN-END:variables
 }

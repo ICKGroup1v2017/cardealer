@@ -1,6 +1,6 @@
 package cardealer.database;
 
-import static cardealer.PositionForm.db;
+import static cardealer.Main.db;
 import cardealer.database.exceptions.EntityExistsException;
 import cardealer.database.exceptions.PersistenceException;
 import cardealer.models.Position;
@@ -66,8 +66,28 @@ public class PositionsEntityFacade {
         return res;
     }
 
-    public Position read(Serializable primaryKey) throws IllegalStateException, IllegalArgumentException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Position read(Serializable primaryKey) throws IllegalStateException, IllegalArgumentException, SQLException {
+       Position inst= null;
+        String loads = "SELECT c.* FROM position c WHERE c.idCar = ?;";
+        Connection connection = db.conn;
+        if (!connection.isClosed()) {
+
+            try (Statement stmt = connection.createStatement()) {
+                ResultSet rs = stmt.executeQuery(loads);
+                while (rs.next()) {
+
+                    inst = new Position(
+                            rs.getLong("idPosition"),
+                            rs.getString("title"),
+                            rs.getString("description"), 
+                            rs.getDate("startDate"),
+                            rs.getDate("endDate"),
+                            rs.getBoolean("status"));
+                   
+                }
+            }
+        }
+        return inst;
     }
 
     public ArrayList<Position> reads() throws EntityExistsException, IllegalStateException,
@@ -84,10 +104,10 @@ public class PositionsEntityFacade {
                     Position inst = new Position(
                             rs.getLong("idPosition"),
                             rs.getString("title"),
-                            rs.getString("description"),
-                            rs.getBoolean("status"), 
+                            rs.getString("description"), 
                             rs.getDate("startDate"),
-                            rs.getDate("endDate"));
+                            rs.getDate("endDate"),
+                            rs.getBoolean("status"));
                     mPositions.add(inst);
                 }
             }

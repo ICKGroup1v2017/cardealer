@@ -5,7 +5,7 @@
  */
 package cardealer.database;
 
-import static cardealer.CarForm.db;
+import static cardealer.Main.db;
 import cardealer.models.Sale;
 import java.io.Serializable;
 import javax.transaction.TransactionRequiredException;
@@ -28,13 +28,24 @@ public class SalesEntityFacade {
             IllegalStateException, IllegalArgumentException,
             TransactionRequiredException, SQLException {
         boolean res = false;
-        String create = "INSERT INTO `cardealer`.`sales`\n"
-                + "(`firstName`,\n"
-                + "`lastName`,\n"
-                + "`price`,\n"
-                + "`car_id`,\n"
-                + "`paid_date`) \n "
-                + " VALUES ( ?, ?, ?, ?, ?);";
+        String create = "INSERT INTO `cardealer`.`sale`\n" +
+"(`firstName`,\n" +
+"`lastName`,\n" +
+"`car_id`,\n" +
+"`price`,\n" +
+"`payment`,\n" +
+"`debt`,\n" +
+"`paid_date`,\n" +
+"`status`)\n" +
+"VALUES\n" +
+"(?,\n" +
+"?,\n" +
+"?,\n" +
+"?,\n" +
+"?,\n" +
+"?,\n" +
+"?,\n" +
+"?)";
 
         Connection connection = db.conn;
         connection.setAutoCommit(false);
@@ -44,12 +55,16 @@ public class SalesEntityFacade {
 
                 stmt.setString(1, entity.getFirstName());
                 stmt.setString(2, entity.getLastName());
-                stmt.setInt(3, (int) entity.getPrice());
-                stmt.setLong(4, entity.getCar_id());
-                stmt.setDate(5, entity.getPaid_date());
+                stmt.setLong(3, entity.getCar_id().getIdCar());
+                stmt.setDouble(4, entity.getPrice());
+                stmt.setDouble(5, entity.getPayment());
+                stmt.setDouble(6, entity.getDebt());
+                stmt.setDate(7, entity.getPaid_date());
+                stmt.setBoolean(8, entity.isStatus());
 
                 res = stmt.execute();
                 db.conn.commit();
+                res = true;
             } catch (SQLException ex) {
                 if (db.conn != null) {
                     System.err.println(ex.getMessage());
@@ -77,14 +92,16 @@ public class SalesEntityFacade {
             IllegalArgumentException, TransactionRequiredException, SQLException {
         ArrayList<Sale> mSales = new ArrayList<>();
 
-        String loads = "SELECT `sales`.`idSale`,\n"
-                + "    `sales`.`firstName`,\n"
-                + "    `sales`.`lastName`,\n"
-                + "    `sales`.`price`,\n"
-                + "    `sales`.`car_id`,\n"
-                + "    `sales`.`sale_date`,\n"
-                + "    `sales`.`paid_date`\n"
-                + "FROM `cardealer`.`sales` ;";
+        String loads = "SELECT `sale`.`idSale`,\n"
+                + "    `sale`.`firstName`,\n"
+                + "    `sale`.`lastName`,\n"
+                + "    `sale`.`car_id`,\n"
+                + "    `sale`.`price`,\n"
+                + "    `sale`.`payment`,\n"
+                + "    `sale`.`sale_date`,\n"
+                + "    `sale`.`paid_date`,\n"
+                + "    `sale`.`debt`,\n"
+                + "    `sale`.`status` FROM sale;";
 
         Connection connection = db.conn;
         if (!connection.isClosed()) {
@@ -93,14 +110,21 @@ public class SalesEntityFacade {
 
                 ResultSet rs = stmt.executeQuery(loads);
                 while (rs.next()) {
-
-                    Sale c = new Sale(rs.getLong("idSale"), rs.getString("firstName"),
-                            rs.getString("lastName"), rs.getDouble("price"),
+                    Car c = new Car(rs.getLong("car_id"));
+                    CarsEntityFacade cef = new CarsEntityFacade();
+                    c = cef.read(c.getIdCar());
+                    Sale s = new Sale(rs.getLong("idSale"),
+                            rs.getString("firstName"),
+                            rs.getString("lastName"),
+                            c,
+                            rs.getDouble("price"),
                             rs.getDouble("payment"),
-                             rs.getLong("car_id"),
-                            rs.getDate("sale_date"), rs.getDate("paid_date"));
+                            rs.getDouble("debt"),
+                            rs.getDate("sale_date"),
+                            rs.getDate("paid_date"),
+                            rs.getBoolean("status"));
 
-                    mSales.add(c);
+                    mSales.add(s);
 
                 }
             }
@@ -110,13 +134,17 @@ public class SalesEntityFacade {
 
     public boolean update(Sale entity) throws IllegalStateException, IllegalArgumentException, TransactionRequiredException, SQLException {
         boolean res = false;
-        String create = "INSERT INTO `cardealer`.`sales`\n"
-                + "(`firstName`,\n"
-                + "`lastName`,\n"
-                + "`price`,\n"
-                + "`car_id`,\n"
-                + "`paid_date`) \n "
-                + " VALUES ( ?, ?, ?, ?, ?);";
+        String create = "UPDATE `cardealer`.`sale`\n"
+                + "SET\n"
+                + "`firstName` = ?,\n"
+                + "`lastName` = ?,\n"
+                + "`car_id` = ?,\n"
+                + "`price` = ?,\n"
+                + "`payment` = ?,\n"
+                + "`debt` = ?,\n"
+                + "`paid_date` = ?,\n"
+                + "`status` = ?\n"
+                + "WHERE `idSale` = ?;";
 
         Connection connection = db.conn;
         connection.setAutoCommit(false);
@@ -126,10 +154,13 @@ public class SalesEntityFacade {
 
                 stmt.setString(1, entity.getFirstName());
                 stmt.setString(2, entity.getLastName());
-                stmt.setDouble(3, entity.getPrice());
-                stmt.setLong(4, entity.getCar_id());
-                stmt.setDate(5, entity.getPaid_date());
-
+                stmt.setLong(3, entity.getCar_id().getIdCar());
+                stmt.setDouble(4, entity.getPrice());
+                stmt.setDouble(5, entity.getPayment());
+                stmt.setDouble(6, entity.getDebt());
+                stmt.setDate(7, entity.getPaid_date());
+                stmt.setBoolean(8, entity.isStatus());
+                stmt.setLong(9, entity.getIdSale());
                 res = stmt.execute();
                 db.conn.commit();
             } catch (SQLException ex) {

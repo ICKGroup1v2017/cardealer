@@ -1,10 +1,9 @@
 package cardealer.database;
 
+import static cardealer.Main.db;
 import cardealer.models.Employees_positions;
-import java.io.Serializable;
 import javax.transaction.TransactionRequiredException;
 import cardealer.database.exceptions.*;
-import static cardealer.EmployeesForm.db;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -71,7 +70,7 @@ public class Employees_positionsEntityFacade {
                 if (rs.next()) {
                     e = new Employees_positions(rs.getInt("id"),
                             rs.getLong("employeeId"),
-                            rs.getLong("positionID"));
+                            rs.getLong("positionID"), rs.getBoolean("status"));
                 }
             }
         }
@@ -89,10 +88,9 @@ public class Employees_positionsEntityFacade {
                 ResultSet rs = stmt.executeQuery(loads);
                 while (rs.next()) {
 
-                    Employees_positions inst = new Employees_positions(
-                            rs.getInt("id"), 
-                            rs.getLong("employeeId"), 
-                            rs.getLong("positionID"));
+                    Employees_positions inst = new Employees_positions(rs.getInt("id"),
+                            rs.getLong("employeeId"),
+                            rs.getLong("positionID"), rs.getBoolean("status"));
                     mEmployees_positionss.add(inst);
                 }
             }

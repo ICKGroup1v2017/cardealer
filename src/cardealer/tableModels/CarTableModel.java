@@ -14,25 +14,25 @@ import javax.swing.table.DefaultTableModel;
  * @author ahmet
  */
 public class CarTableModel extends DefaultTableModel {
-
+    
     public CarTableModel() {
         super();
     }
-
-    private String[] columnNames = {"ID", "Make", "Model", "Manufacturing Year"};
-
+    
+    private String[] columnNames = {"ID", "Bërja", "Modeli", "Viti i prodhimit","Çmimi", "Status"};
+    
     public int getColumnCount() {
         return columnNames.length;
     }
-
+    
     public int getRowCount() {
         return dataVector.size();
     }
-
+    
     public String getColumnName(int col) {
         return columnNames[col];
     }
-
+    
     public Car getSelectedRow(int row) {
         Vector v = (Vector) dataVector.get(row);
         System.out.println("v = " + v.get(0).getClass());
@@ -41,13 +41,15 @@ public class CarTableModel extends DefaultTableModel {
         String make = ((String) v.get(1));
         String model = ((String) v.get(2));
         Integer manufacturingYear = Integer.parseInt((String) v.get(3));
-       
-       
-        c.setId(id);
+        Double price = Double.parseDouble((String)v.get(4));
+        boolean status = Boolean.parseBoolean((String) v.get(5));
+        
+        c.setIdCar(id);
         c.setMake(make);
         c.setModel(model);
         c.setManufacturingYear(manufacturingYear);
-      
+        c.setPrice(price);
+        c.setStatus(status);
         
         return c;
     }
@@ -65,10 +67,9 @@ public class CarTableModel extends DefaultTableModel {
      * Don't need to implement this method unless your table's editable.
      */
     public boolean isCellEditable(int row, int col) {
-         
-
+        
         return false;
-
+        
     }
-
+    
 }

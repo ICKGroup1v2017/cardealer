@@ -4,66 +4,82 @@
  * and open the template in the editor.
  */
 package cardealer.models;
- 
- 
+
 import java.util.Objects;
 
 /**
  *
  * @author ahmet
  */
-public class Car  implements Comparable<Car> {
+public class Car implements Comparable<Car> {
 
     private final String nl = System.lineSeparator();
-    private Long id;
+    private Long idCar;
     private String make;
     private String model;
     private Integer manufacturingYear;
-    
-
-    
+    private Double price;
+    private boolean status;
 
     public Car() {
-        this.id = 0L;
+        this.idCar = 0L;
         this.make = "";
         this.model = "";
         this.manufacturingYear = 2017;
-       
+        this.price = 0d;
+        this.status = false;
     }
 
     public Car(Long id) {
         this();
-        this.id = id;
+        this.idCar = id;
     }
 
     public Car(Long id, String make) {
         this();
-        this.id = id;
+        this.idCar = id;
         this.make = make;
     }
 
     public Car(Long id, String make, String model) {
         this();
-        this.id = id;
+        this.idCar = id;
         this.make = make;
         this.model = model;
     }
 
     public Car(Long id, String make, String model, Integer manufacturingYear) {
-        this.id = id;
+        this();
+        this.idCar = id;
         this.make = make;
         this.model = model;
         this.manufacturingYear = manufacturingYear;
     }
- 
-  
 
-    public Long getId() {
-        return id;
+    public Car(Long idCar, String make, String model, Integer manufacturingYear, double price) {
+        this();
+        this.idCar = idCar;
+        this.make = make;
+        this.model = model;
+        this.manufacturingYear = manufacturingYear;
+        this.price = price;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public Car(Long idCar, String make, String model, Integer manufacturingYear, Double price, boolean status) {
+        this.idCar = idCar;
+        this.make = make;
+        this.model = model;
+        this.manufacturingYear = manufacturingYear;
+        this.price = price;
+        this.status = status;
+    }
+
+    public Long getIdCar() {
+        return idCar;
+    }
+
+    public void setIdCar(Long idCar) {
+        this.idCar = idCar;
     }
 
     public String getMake() {
@@ -89,52 +105,32 @@ public class Car  implements Comparable<Car> {
     public void setManufacturingYear(Integer manufacturingYear) {
         this.manufacturingYear = manufacturingYear;
     }
- 
- 
 
-    @Override
-    public int compareTo(Car o) {
-        return this.id.compareTo(o.getId());
+    public Double getPrice() {
+        return price;
     }
 
-    
-
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 53 * hash + Objects.hashCode(this.id);
-        hash = 53 * hash + Objects.hashCode(this.make);
-        hash = 53 * hash + Objects.hashCode(this.model);
-        hash = 53 * hash + Objects.hashCode(this.manufacturingYear);
-        return hash;
+    public void setPrice(Double price) {
+        this.price = price;
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final Car other = (Car) obj;
-        if (!Objects.equals(this.make, other.make)) {
-            return false;
-        }
-        if (!Objects.equals(this.model, other.model)) {
-            return false;
-        }
-        if (!Objects.equals(this.id, other.id)) {
-            return false;
-        }
-        return Objects.equals(this.manufacturingYear, other.manufacturingYear);
+    public boolean isStatus() {
+        return status;
     }
+
+    public void setStatus(boolean status) {
+        this.status = status;
+    }
+
+     
 
     @Override
     public String toString() {
-        return "Car{" + "nl=" + nl + ", id=" + id + ", make=" + make + ", model=" + model + ", manufacturingYear=" + manufacturingYear + '}';
+        return make + " | " + model + " | " + manufacturingYear;
+    }
+
+    @Override
+    public int compareTo(Car t) {
+        return this.idCar.compareTo(t.getIdCar());
     }
 }

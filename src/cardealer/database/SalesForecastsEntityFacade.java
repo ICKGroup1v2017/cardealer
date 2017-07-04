@@ -5,7 +5,7 @@
  */
 package cardealer.database;
 
-import static cardealer.SalesForecastForm.db;
+import static cardealer.Main.db;
 import cardealer.models.SaleForecast;
 import java.io.Serializable;
 import javax.transaction.TransactionRequiredException;

@@ -9,7 +9,7 @@ import cardealer.models.Car;
 import java.io.Serializable;
 import javax.transaction.TransactionRequiredException;
 import cardealer.database.exceptions.*;
-import static cardealer.CarForm.db;
+import static cardealer.Main.db;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -33,14 +33,15 @@ public class CarsEntityFacade {
      * @throws IllegalStateException
      * @throws IllegalArgumentException
      * @throws TransactionRequiredException
+     * @throws java.sql.SQLException
      */
     public boolean create(Car entity) throws EntityExistsException,
             IllegalStateException, IllegalArgumentException,
             TransactionRequiredException, SQLException {
         boolean res = false;
-        String create = "INSERT INTO `car`(  `make`, `model`, "
-                + "`manufacturingYear`) "
-                + "VALUES ( ?,?,?);";
+        String create = "INSERT INTO `car`"
+                + "      (  `make`, `model`, `manufacturingYear`,`price`, `status` ) "
+                + "VALUES ( ?, ?, ?, ?, ?);";
 
         Connection connection = db.conn;
         connection.setAutoCommit(false);
@@ -51,8 +52,10 @@ public class CarsEntityFacade {
                 stmt.setString(1, entity.getMake());
                 stmt.setString(2, entity.getModel());
                 stmt.setInt(3, entity.getManufacturingYear());
+                stmt.setDouble(4, entity.getPrice());
+                stmt.setBoolean(5, entity.isStatus());
 
-                res = stmt.executeUpdate()>0;
+                res = stmt.executeUpdate() > 0;
                 db.conn.commit();
             } catch (SQLException ex) {
                 if (db.conn != null) {
@@ -73,8 +76,28 @@ public class CarsEntityFacade {
         return res;
     }
 
-    public Car read(Serializable primaryKey) throws IllegalStateException, IllegalArgumentException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Car read(Long primaryKey) throws IllegalStateException, IllegalArgumentException, SQLException {
+        Car mc = new Car(primaryKey);
+        String loads = "SELECT c.* FROM car c WHERE c.idCar = ? ;";
+
+        Connection connection = db.conn;
+        if (!connection.isClosed()) {
+
+            try (PreparedStatement stmt = connection.prepareStatement(loads)) {
+                stmt.setLong(1, primaryKey);
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) {
+
+                    mc = new Car(rs.getLong("idCar"), 
+                            rs.getString("make"),
+                            rs.getString("model"),
+                            rs.getInt("manufacturingYear"), 
+                            rs.getDouble("price"), 
+                            rs.getBoolean("status"));
+                }
+            }
+        }
+        return mc;
     }
 
     public ArrayList<Car> reads() throws EntityExistsException, IllegalStateException,
@@ -91,8 +114,8 @@ public class CarsEntityFacade {
                 ResultSet rs = stmt.executeQuery(loads);
                 while (rs.next()) {
 
-                    Car c = new Car(rs.getLong("id"), rs.getString("make"),
-                            rs.getString("model"), rs.getInt("manufacturingYear"));
+                    Car c = new Car(rs.getLong("idCar"), rs.getString("make"),
+                            rs.getString("model"), rs.getInt("manufacturingYear"),rs.getDouble("price"), rs.getBoolean("status"));
 
                     mCars.add(c);
 
@@ -105,10 +128,12 @@ public class CarsEntityFacade {
     public boolean update(Car entity) throws IllegalStateException, IllegalArgumentException, TransactionRequiredException, SQLException {
         boolean res = false;
         String update = "UPDATE `cardealer`.`car`\n"
-                + "SET\n" 
+                + "SET\n"
                 + "`make` = ?,\n"
                 + "`model` = ?,\n"
-                + "`manufacturingYear` = ?\n"
+                + "`manufacturingYear` = ?,\n"
+                + "`price` = ?,"
+                + "`status` = ?"
                 + " WHERE `id` = ?;\n";
 
         Connection connection = db.conn;
@@ -120,8 +145,10 @@ public class CarsEntityFacade {
                 stmt.setString(1, entity.getMake());
                 stmt.setString(2, entity.getModel());
                 stmt.setInt(3, entity.getManufacturingYear());
-                stmt.setLong(4, entity.getId());
-                res = stmt.executeUpdate()>0;
+                stmt.setDouble(4, entity.getPrice());
+                stmt.setBoolean(5, entity.isStatus());
+                stmt.setLong(6, entity.getIdCar());
+                res = stmt.executeUpdate() > 0;
                 db.conn.commit();
             } catch (SQLException ex) {
                 if (db.conn != null) {
@@ -136,6 +163,12 @@ public class CarsEntityFacade {
 
     public boolean deleteO(Car entity) throws IllegalStateException, IllegalArgumentException, TransactionRequiredException, PersistenceException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public Car readByMakeAndModel(String vetura) {
+        Car c = new Car();
+         
+        return c;
     }
 
 }
